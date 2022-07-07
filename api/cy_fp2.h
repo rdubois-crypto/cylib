@@ -1,15 +1,8 @@
-/*
- * cy_fp2.h
- *
- *  Created on: Jul 5, 2022
- *      Author: dubois
- */
 
-#ifndef API_CY_FP2_H_
-#define API_CY_FP2_H_
+#ifndef _CY_FP2_H
+#define _CY_FP2_H
 
 
 
 
-
-#endif /* API_CY_FP2_H_ */
+#endif
