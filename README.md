@@ -4,6 +4,7 @@ An attempt to merge several different cryptographic libs into unified APIs:
 - libECC (ANSSI)
 - lib256k1zkp (with optional modules)
 - blst
+- relic
 - sodium
 - bearssl
 - openssl
