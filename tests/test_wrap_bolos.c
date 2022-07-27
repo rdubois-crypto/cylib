@@ -14,12 +14,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "cx_ec.h"
-#include "cxlib.h"
-#include "cy_errors.h"
+#include "../../../src/innovation/cy_wrap_fp_bolos.h"
+#include "bolos/cx_ec.h"
+#include "bolos/cxlib.h"
 
-#include "cy_wrap_bolos.h"
-#include "cy_fp.h"
+
+#include "innovation/cy_errors.h"
+
+#include "innovation/cy_fp.h"
 
 static uint8_t const secp384r1_p[] = {
   // p:
@@ -33,19 +35,72 @@ static uint8_t const secp384r1_p[] = {
 
 static uint8_t const secp384r1_t8[] ={48, 0, 0, 0, 0, 0, 0, 0};
 
+//p-1
+static uint8_t secp384_r1_a[]={
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xfe
+};
+
+//some number
+static uint8_t secp384_r1_b[]={
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xff, 0xff,
+		  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xaa
+};
+
+static uint8_t secp384_r1_r[48]={
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+};
+
+static void Print_RAMp(uint8_t *Ramp){
+	size_t i;
+	printf("\n RAM:\n");
+	for(i=0;i<_MAX_MEMORY;i++) {
+		printf("%02X", Ramp[i]);
+		if((i&0xf)==15) printf("\n");
+	}
+}
+
 int main()
 {
 	fp_ctx_t ctx;
-	cy_error_t error;
+	cy_fp_t fp_a,fp_b, fp_r;
+	cy_error_t error=CY_OK;
 	/* The shared ram between program and library*/
     uint8_t Ramp[_MAX_MEMORY];
+
+    printf("\n @RAMP=%x",  (unsigned int) Ramp);
+
+    memset(Ramp, 0x55, sizeof(Ramp));
+	Print_RAMp(Ramp);
 
     const uint8_t *argv[]={secp384r1_t8, secp384r1_p};
 
 	printf("\n test bolos wrap:");
-	error=wrap_bolos_fp_init(&ctx, Ramp , _MAX_MEMORY, 2, argv);
+	error|=cy_fp_init(&ctx, Ramp , _MAX_MEMORY, 2, argv);
+	Print_RAMp(Ramp);
 
-	if(error==CY_OK) printf(" OK\n");
+	//error|=cy_fp_alloc(&ctx, 48, &fp_a);
+
+	CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_a));
+	CY_CHECK(cy_fp_import(&ctx,secp384_r1_a,  48, &fp_a));
+
+	CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_b));
+	CY_CHECK(cy_fp_import(&ctx,secp384_r1_b,  48, &fp_b));
+
+	CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_r));
+
+
+	CY_CHECK(cy_fp_add(&ctx, &fp_a, &fp_b, &fp_r));
+
+	end:
+
+	if(error==CY_OK) printf(" OK !\n");
 	else printf(" KO\n");
 	return error;
 }
