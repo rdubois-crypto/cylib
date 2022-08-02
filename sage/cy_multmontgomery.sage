@@ -27,7 +27,7 @@ WORD128_MASK = 0xffffffffffffffffffffffffffffffff
 g_size = -1
 
 #/*********** Simulating machine words ************/ 
-def Conv_word(A, size_word):
+def Conv_word_LSB(A, size_word):
 	sizeA=ceil(log(A)/log(2))  
 	print("sizeA=",sizeA)
 	sizeM=ceil(sizeA/size_word)
@@ -40,7 +40,22 @@ def Conv_word(A, size_word):
 		print("i=",hex(M[i]));
 		A = A >> size_word
 	return M;	
-
+	
+def Conv_word_MSB(A, size_word):
+	sizeA=ceil(log(A)/log(2))  
+	print("sizeA=",sizeA)
+	sizeM=ceil(sizeA/size_word)
+	print("sizeM=",sizeM)
+	M=copy(matrix(1, sizeM)[0])
+	
+	mask = 2^size_word-1
+	for i in [0..sizeM-1]:
+		M[sizeM-1-i]= A 	& mask;
+		print("i=",hex(M[i]));
+		A = A >> size_word
+	return M;	
+	
+	
 def Conv_Num(M, size_word):
 	A=0;
 	for i in [0..len(u)-1]:
@@ -190,18 +205,18 @@ def test_modulus(n, size, a, b):
 
 g_size = 128
 
-test_modulus(n,128,a, b)
+#test_modulus(n,128,a, b)
 n0_expected=0xf31c335364fbed41065a0cd88ff7a41
 
-mod_aR=Conv_word(aR,128)
-mod_bR=Conv_word(bR, 128)
-mod_n=Conv_word(n, 128)
-r=MontGomery_Mult(mod_aR, mod_bR,mod_n,n0_expected, r, 2)
-PRINT_HEXATAB(r,3)
-mod_aR=MontGomery_Mult(mod_bR, r,mod_n,n0_expected, mod_aR, 2)
-PRINT_HEXATAB(mod_aR,3)
-mod_bR=MontGomery_Mult(mod_aR, r,mod_n,n0_expected, mod_bR, 2)
-PRINT_HEXATAB(mod_bR,3)
+#mod_aR=Conv_word(aR,128)
+#mod_bR=Conv_word(bR, 128)
+#mod_n=Conv_word(n, 128)
+#r=MontGomery_Mult(mod_aR, mod_bR,mod_n,n0_expected, r, 2)
+#PRINT_HEXATAB(r,3)
+#mod_aR=MontGomery_Mult(mod_bR, r,mod_n,n0_expected, mod_aR, 2)
+#PRINT_HEXATAB(mod_aR,3)
+#mod_bR=MontGomery_Mult(mod_aR, r,mod_n,n0_expected, mod_bR, 2)
+#PRINT_HEXATAB(mod_bR,3)
 
 
 
@@ -213,33 +228,43 @@ PRINT_HEXATAB(mod_bR,3)
 
 
 #sec256k1 modulus
-#n=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
-#aR = 0x329efd7b3f30d8b2c2476c804506484dfcd150436a0cbf871ad7a1c78e2ac345
-#bR = 0x49e541bf948579eb4e92ebf5e8f0f80f184c6db04df8670013dde86d17cdf296
-#expected =0xf3d1ecf7de8a92956ee05242b9e6342d8a4be8f1965c3693686e0ba06791184d
+n=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
+aR = 0x329efd7b3f30d8b2c2476c804506484dfcd150436a0cbf871ad7a1c78e2ac345
+bR = 0x49e541bf948579eb4e92ebf5e8f0f80f184c6db04df8670013dde86d17cdf296
+expected =0xf3d1ecf7de8a92956ee05242b9e6342d8a4be8f1965c3693686e0ba06791184d
+a=0xac373f3fbdf8edff670873cee395a935329efd7b3f30d8b2c2476c7f98cf067d
+b=0xc1554db541bedcf0648f35904d527cb649e541bf948579eb4e92ebf5279ba778
 
-#size=floor(log(2^128)/log(2))  
+size=floor(log(2^128)/log(2))  
 
-#Fp=FiniteField(n)
+Fp=FiniteField(n)
 
-#R=2^g_size;
-#n0=mod(-n, 2^g_size)^-1
-#Rm1 = Fp(2^g_size)^-1
+R=2^g_size;
+n0=mod(-n, 2^g_size)^-1
+Rm1 = Fp(2^g_size)^-1
 
-#Mr=Fp(aR*bR*Rm1)
+Mr=Fp(aR*bR*Rm1)
 
-#vec_a=Conv_word(aR, g_size)
-#vec_b=Conv_word(bR, g_size)
-#vec_p=Conv_word(n, g_size)
-#r=O
+vec_a=Conv_word_MSB(aR, 8)
+vec_b=Conv_word_MSB(bR, g_size)
+vec_p=Conv_word_MSB(n, g_size)
+r=O
+
+hex(a*Rm1*b*Rm1*R);
+
+
+#MontGomery_Mult(vec_a,vec_b,vec_p , n0, r, 2)
+
+#import subprocess
+
+#a=subprocess.check_output(["./test"])
+
+Conv_word_MSB(aR, 8)
+Conv_word_MSB(bR, 8)
+Conv_word_MSB(expected, 8)
 
 
 
-#ModInt_Mul_C(vec_a,vec_b,vec_p , n0, r, 2)
-
-import subprocess
-
-a=subprocess.check_output(["./test"])
 
 
 

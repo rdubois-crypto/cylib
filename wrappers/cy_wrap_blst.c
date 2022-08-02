@@ -10,21 +10,21 @@
 
 cy_error_t wrap_blst_fp_add(fp_ctx_t *ctx,  *a, *b, *r){
 
- CY_UNUSED(ctx);
+ UNUSED(ctx);
  add_fp(r, a, b);
  return CY_OK;
 }
 
 cy_error_t wrap_blst_fp_sub(fp_ctx_t *ctx,  *a, *b, *r){
 
- CY_UNUSED(ctx);
+ UNUSED(ctx);
  sub_fp(r, a, b);
  return CY_OK;
 }
 
 cy_error_t wrap_blst_fp_mult_mont(fp_ctx_t *ctx,  *a, *b, *r){
 
- CY_UNUSED(ctx);
+ UNUSED(ctx);
  mul_fp(r, a, b);
 
  return CY_OK;

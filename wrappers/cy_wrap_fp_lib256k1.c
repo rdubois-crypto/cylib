@@ -1,3 +1,13 @@
+/**********************************************************************************/
+/* Copyright (C) 2022 - Renaud Dubois											  */
+/* This file is part of cy_lib project						 					  */
+/* License: This software is licensed under a dual BSD and GPL v2 license. 	      */
+/* See LICENSE file at the root folder of the project.				 			  */
+/* FILE: cy_wrap_bolos.h								   		                  */
+/* 																			      */
+/* 																			      */
+/* DESCRIPTION: lib256k1 wrappers for cy_lib	                                  */
+/**********************************************************************************/
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
@@ -21,6 +31,8 @@ cy_error_t wrap_lib256k1_fp_init(fp_ctx_t *ps_ctx, uint8_t *pu8_Mem , const size
 		const int argc, const uint8_t *argv[]){
 
 	cy_error_t error=CY_KO;
+
+
 	size_t i;
 	size_t offset=0;
 
@@ -84,8 +96,10 @@ cy_error_t wrap_lib256k1_fp_alloc(fp_ctx_t *ctx ,  size_t t8_r, cy_fp_t *r){
   return error;
 }
 
-cy_error_t wrap_lib256k1_fp_import(fp_ctx_t *ctx ,  uint8_t *in, size_t t8_in, cy_fp_t *out){
+cy_error_t wrap_lib256k1_fp_import(  uint8_t *in, size_t t8_in, cy_fp_t *out){
 	cy_error_t error=CY_KO;
+	fp_ctx_t *ctx =out->ctx;
+
 	size_t i;
 
 	 if(ctx->is_initialized!=CY_LIB_INITIALIZED){
@@ -100,7 +114,7 @@ cy_error_t wrap_lib256k1_fp_import(fp_ctx_t *ctx ,  uint8_t *in, size_t t8_in, c
 		 (cin.n)[i]=word32_from_be( (in+(i<<3)));
 	 }
 
-	 (secp256k1_fe_from_storage(out, &cin));
+	 (secp256k1_fe_from_storage(out->bn, &cin));
 
 	 error=CY_OK;
 
