@@ -87,3 +87,27 @@ cy_error_t wrap_bolos_ec_init(ec_ctx_t *ec_ctx, uint8_t *pu8_Mem , const size_t 
 	return error;
 
 }
+
+cy_error_t wrap_bolos_ec_add( cy_ecpoint_t *a, cy_fp_t *b, cy_fp_t *out){
+ cy_error_t error=CY_KO;
+ fp_ctx_t *ctx =a->ctx;
+
+ if(ctx->is_initialized!=CY_LIB_INITIALIZED){
+	 error=CY_ERR_UNIT;
+
+	 goto end;
+ }
+
+ CX_CHECK(sys_cx_bn_mod_add(*(out->bn),*(a->bn),*(b->bn), *((cx_bn_t *) ctx->modular)));
+
+ error=CY_OK;
+
+ end:
+  return error;
+}
+
+
+
+
+
+

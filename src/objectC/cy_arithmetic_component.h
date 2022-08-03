@@ -27,7 +27,7 @@ typedef cy_error_t (*Fct_Arithm_UnInit_t) (void *i_p_ctx);
 uint8_t *Sec_RAMp;
 
 
-struct ari_generic_field_s{
+struct cy_ari_generic_field_s{
   uint8_t *Sec_RAMp; /* pointer between the Shared RAM and the component*/
 
   uint64_t                         id;                   		/**< Component identifier                                   */
@@ -53,7 +53,7 @@ struct ari_generic_field_s{
   void *opt;
 };
 
-typedef struct ari_generic_field_s CY_Arithm_Field_Component_t;
+typedef struct cy_ari_generic_field_s cy_arithm_Field_Component_t;
 
 
 
