@@ -17,10 +17,15 @@ The framework is mainly intended to enable to switch primitives and accelerators
 ![cylib](https://user-images.githubusercontent.com/103030189/178018785-ea4ea373-3eff-418f-a897-f205440740b8.png)
 
 
+## How to integrate a library or an accelerator in CY_LIB ?
+
+Most of cryptographic accelerators implement modular field accelerations. This function shall be wrapped as done for instance in cy_wrap_bolos_* files. For NDA reasons it is not possible to publish examples over the NESCRYPT (STM secure element), but it is an example of such cryptocoprocessor.
+
+According to the lib, various level of integration into CY_LIB is possible. One could choose to benefit from asm efficient prime field/elliptic curve implementation to benefit from high performances, then publish a code that could be reused by some HW manufacturer. The framework shall later enable fair performances benches of protocols.
 
 ## Roadmap
 - define APIs
-- add emulations of vectorized and wrappers as neon2sse and sse2neon 
+- add emulations of vectorized integers as wrappers such as neon2sse.h and sse2neon.h 
 - generic Montgomery multiplier, adapted to any wordsize, including vectorized types and 128 bits multiplier (some hardware accelerators provide it).
 - road to zkp: generic pairings and polynomial commitments.
 
@@ -37,7 +42,7 @@ Copyright (C) 2017-2022
 This software is licensed under a dual BSD and GPL v2 license. See LICENSE file at the root folder of the project.
 
 ## Contributing
-The framework is at its very firt steps. Please contact me.
+Please contact me.
 
 ## Related projects
 
@@ -47,5 +52,5 @@ The framework is at its very firt steps. Please contact me.
 - https://github.com/LedgerHQ/speculos : an emulator of the open device Nano which enables to developp for a secure element from Ledger
 - https://github.com/supranational/blst : implementation of bls12-381 curve
 - https://github.com/intel/ARM_NEON_2_x86_SSE/blob/master/NEON_2_SSE.h :A C/C++ header file that converts Arm/Aarch64 NEON intrinsics to Intel SSE intrinsics .
-
+- https://www.datasheetarchive.com/NESCRYPT-datasheet.html
 
