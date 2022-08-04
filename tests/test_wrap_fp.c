@@ -24,6 +24,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+
+#include "test_common_tools.h"
+
 #define _BOLOS_BURRITOS
 #ifdef _BOLOS_BURRITOS
 #include "bolos/cx_ec.h"
@@ -120,35 +123,24 @@ uint8_t mod_expected[] = { 57,  165, 57,  230, 138, 185, 240, 26,
                            243, 209, 236, 247, 222, 138, 146, 149,
                            110, 224, 82,  66,  128, 64,  249, 107 };
 
-static void Print_RAMp(uint8_t *Ramp)
-{
-  size_t i;
-  printf("\n @RAMP=%x RAM:\n", (unsigned int)Ramp);
-  for (i = 0; i < _MAX_MEMORY; i++) {
-    printf("%02X", Ramp[i]);
-    if ((i & 0xf) == 15)
-      printf("\n");
-  }
-}
 
-int test_crypto_parameters(const uint8_t *argv[], int argc, char *name)
+int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t *Ramp, size_t sizeRam)
 {
   fp_ctx_t ctx;
   cy_fp_t fp_a, fp_b, fp_r;
   cy_error_t error = CY_OK;
   /* The shared ram between program and library*/
-  uint8_t Ramp[_MAX_MEMORY];
-  printf("\n ******************* %s *************************\n ", name);
-  printf("\n @RAMP=%x", (unsigned int)Ramp);
 
-  memset(Ramp, 0x55, sizeof(Ramp));
-  Print_RAMp(Ramp);
+  debug_printf("\n @RAMP=%x", (unsigned int)Ramp);
 
-  CY_CHECK(cy_fp_init(&ctx, Ramp, _MAX_MEMORY, argc, argv));
-  printf("\n test %s wrap with %s:", ctx.libname, name);
-  Print_RAMp(Ramp);
+  memset(Ramp, 0x55, sizeRam);
+  Print_RAMp(Ramp, sizeRam);
 
-  printf("\n end init");
+  CY_CHECK(cy_fp_init(&ctx, Ramp, sizeRam, argc, argv));
+  printf("\n %s  : %s:", ctx.libname, name);
+  Print_RAMp(Ramp, sizeRam);
+
+  debug_printf("\n end init");
 
   CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_a));
   CY_CHECK(cy_fp_import(secp384_r1_a, 48, &fp_a));
@@ -159,37 +151,49 @@ int test_crypto_parameters(const uint8_t *argv[], int argc, char *name)
   CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_r));
   CY_CHECK(cy_fp_add(&fp_a, &fp_b, &fp_r));
 
-  printf("\n free");
-  Print_RAMp(Ramp);
+  debug_printf("\n free");
+  Print_RAMp(Ramp, sizeRam);
 
   CY_CHECK(cy_fp_free(&fp_a));
   CY_CHECK(cy_fp_free(&fp_b));
   CY_CHECK(cy_fp_free(&fp_r));
-  printf("\n uninit");
+  debug_printf("\n uninit");
 
-  CY_CHECK(cy_fp_uninit(&ctx, Ramp, _MAX_MEMORY));
-  Print_RAMp(Ramp);
+  CY_CHECK(cy_fp_uninit(&ctx, Ramp, sizeRam));
+  Print_RAMp(Ramp, sizeRam);
 
 end:
   // printf("\n end crypto");
   if (error == CY_OK)
-    printf(" OK !\n");
+    printf(" OK !");
   else
     printf(" KO\n");
 
   return error;
 }
 
+static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
+{
+	cy_error_t error = CY_OK;
+
+	printf("\n/************************ Test Fp Unit:");
+#ifndef _LIB256K1_BURRITOS
+	 CY_CHECK(test_crypto_parameters(argv_bls381, 2, "bls12_381", Ramp, Ramp_t8));
+	 CY_CHECK(test_crypto_parameters(argv_sec384, 2, "secp384r1", Ramp, Ramp_t8));
+#endif
+	 //CY_CHECK(test_crypto_parameters( argv_sec256, 2, "sec256k1"));
+	  end:
+	  return error;
+}
+
+#ifndef _TEST_ALL
 int main()
 {
 
-  cy_error_t error = CY_OK;
-#ifndef _LIB256K1_BURRITOS
-  CY_CHECK(test_crypto_parameters(argv_bls381, 2, "bls12_381"));
-  CY_CHECK(test_crypto_parameters(argv_sec384, 2, "secp384r1"));
+  uint8_t Ramp[_MAX_MEMORY];
 
-#endif
-  //	CY_CHECK(test_crypto_parameters( argv_sec256, 2, "sec256k1"));
+  cy_error_t error = CY_OK;
+  CY_CHECK(test_fp_unit(Ramp, _MAX_MEMORY));
 
 end:
   printf("\n Overall results:");
@@ -199,3 +203,4 @@ end:
     printf(" KO\n");
   return (int)error;
 }
+#endif
