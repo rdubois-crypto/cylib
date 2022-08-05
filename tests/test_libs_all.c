@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 #include "innovation/cy_def.h"
 #include "innovation/cy_errors.h"
 #include "innovation/cy_memory_unit.h"
@@ -38,15 +39,22 @@
 #include "test_cy_mem_unit.c"
 #include "test_wrap_fp.c"
 
+#define _FP_ZONE_T8 (_MAX_MEMORY>>1)
 
 cy_error_t test_all(cryptolib_ctx_t *cryptolib)
 {
 	cy_error_t error = CY_OK;
+	uint8_t *FpZone;
 
+	/* testing memory unit, giving back a closed module*/
 	CY_CHECK(test_mem_unit(cryptolib));
-	CY_CHECK(test_fp_unit(cryptolib->mem_unit->Shared_Memory, cryptolib->mem_unit->allocated_t8));
 
-	printf("\n here error=%d", error);
+	/* initializing memory unit for the tests*/
+	CY_CHECK(cy_mem_malloc(cryptolib->mem_unit, _FP_ZONE_T8, &FpZone));
+	CY_CHECK(test_fp_unit(cryptolib->mem_unit->Shared_Memory, _FP_ZONE_T8));
+	CY_CHECK(cy_mem_free(cryptolib->mem_unit, FpZone, _FP_ZONE_T8));
+
+
 	  end:
 	  return error;
 }
@@ -57,9 +65,8 @@ int main()
 	uint8_t Ramp[_MAX_MEMORY];
 	cryptolib_ctx_t cryptolib;
 
-	  printf("\n/************************ Test All *****************************************/");
+	  printf("\n/************************ Test All modules*****************************************/");
 
-	  debug_printf("\n @RAMP=%x", (unsigned int)Ramp);
 	  Print_RAMp(Ramp, _MAX_MEMORY);
 
 	  printf("\n Starting lib, @RAMP=%x", (unsigned int)Ramp);
@@ -69,8 +76,11 @@ int main()
 	  CY_CHECK(test_all(&cryptolib));
 
 	  printf("\n\n /************************ Test Closing lib:", (unsigned int)Ramp);
-	  CY_CHECK(cy_lib_uninit(&cryptolib));
+	  debug_printf("\n @RAMP=%x \n offset=%d", (unsigned int)Ramp, cryptolib.mem_unit->offset);
+
 	  Print_RAMp(Ramp, _MAX_MEMORY);
+
+	  CY_CHECK(cy_lib_uninit(&cryptolib));
 
 	  end:
 	    if (error == CY_OK)

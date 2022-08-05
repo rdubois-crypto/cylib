@@ -1,11 +1,15 @@
 /**********************************************************************************/
-/* Copyright (C) 2022 - This file is part of cy_lib project						  */
-/* License: This software is licensed under a dual BSD and GPL v2 license. 	      */
-/* See LICENSE file at the root folder of the project.							  */
-/* FILE: cy_word64.h										   		              */
+/* Copyright (C) 2022 - This file is part of cy_lib project
+ */
+/* License: This software is licensed under a dual BSD and GPL v2 license.
+ */
+/* See LICENSE file at the root folder of the project.
+ */
+/* FILE: cy_word64.h
+ */
 /* 																			      */
 /* 																			      */
-/* DESCRIPTION: error handling API		                                              */
+/* DESCRIPTION: error handling API */
 /**********************************************************************************/
 #ifndef _CY_ERRORS_H
 #define _CY_ERRORS_H
@@ -23,8 +27,8 @@
 typedef int cy_error_t;
 typedef int cy_flag_t;
 
-#define CY_LIB_INITIALIZED ((int) 0xfffffffb)
-#define CY_LIB_UNITIALIZED ((int) 0xffffffcb)
+#define CY_LIB_INITIALIZED ((int)0xfffffffb)
+#define CY_LIB_UNITIALIZED ((int)0xffffffcb)
 
 #define CY_INCOMPLETE_IMPLEMENTATION 0xfffffffffffffffa
 
@@ -32,22 +36,21 @@ typedef int cy_flag_t;
 #define CY_OK 0
 #define CY_KO 1
 
-#define CY_TRUE 1
+#define CY_TRUE  1
 #define CY_FALSE 0
 
 #define CY_EQU 0
 
-#define CY_ERR_ALLOC ((int) 0xfffffff1)
-#define CY_ERR_INIT  ((int) 0xffffff3)
+#define CY_ERR_ALLOC ((int)0xfffffff1)
+#define CY_ERR_INIT  ((int)0xffffff3)
 
-#define CY_ERR_UNIT  ((int) 0xffffffa)
-#define CY_ERR_LENGTH ((int) 0xffffffb)
-
+#define CY_ERR_UNIT   ((int)0xffffffa)
+#define CY_ERR_LENGTH ((int)0xffffffb)
 
 /* Memory unit errors */
-#define CY_MEM_OVERFLOW 0xfffffffffffff1
-
-#define CY_MEM_FREE_INDEX 0xfffffffffffff2
+#define CY_MEM_OVERFLOW 0xfffffff1
+#define CY_MEM_FREE_INDEX 0xfffffff2
+#define CY_MEM_FREE_MISSING 0xf3fffff2
 
 /* Modular integers errors*/
 
@@ -58,7 +61,6 @@ typedef int cy_flag_t;
 /* Quadratic extensions  errors*/
 
 /* Pairing computations errors*/
-
 
 #define CY_UNUSED(x) x
 

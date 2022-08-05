@@ -46,6 +46,9 @@
 
 #include "innovation/cy_fp.h"
 
+#define _MAX_SIZE_TESTED_FP_T8 48
+
+
 static uint8_t BLS12_381_P[48] = {
   0x1a, 0x01, 0x11, 0xea, 0x39, 0x7f, 0xe6, 0x9a, 0x4b, 0x1b, 0xa7, 0xb6,
   0x43, 0x4b, 0xac, 0xd7, 0x64, 0x77, 0x4b, 0x84, 0xf3, 0x85, 0x12, 0xbf,
@@ -95,11 +98,12 @@ static uint8_t C_cx_secp256k1_p[] = {
   0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xfc, 0x2f
 };
 
+/* size coded on 64 bits lsb*/
 static uint8_t const secp256k1_t8[] = { 32, 0, 0, 0, 0, 0, 0, 0 };
 
 const uint8_t *argv_sec256[] = { secp256k1_t8, C_cx_secp256k1_p };
 
-/* test vector from cy_multmontgomery.sage for sec384*/
+/* test vector from cy_multmontgomery.sage for ?*/
 
 uint8_t mont_aR[] = { 50,  158, 253, 123, 63,  48,  216, 178, 194, 71,  108,
                       128, 69,  6,   72,  77,  252, 209, 80,  67,  106, 12,
@@ -123,40 +127,73 @@ uint8_t mod_expected[] = { 57,  165, 57,  230, 138, 185, 240, 26,
                            243, 209, 236, 247, 222, 138, 146, 149,
                            110, 224, 82,  66,  128, 64,  249, 107 };
 
+struct cy_test_fp_s {
+  size_t modular_t8;
+
+  char *vector_name;
+  uint8_t *a;
+  uint8_t *b;
+  uint8_t *r_add;
+  uint8_t *r_mul;
+  uint8_t *r_expo;
+
+};
+
+typedef struct cy_test_fp_s cy_test_fp_t;
+
+cy_test_fp_t secp384_r1={
+  384,
+
+};
 
 int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t *Ramp, size_t sizeRam)
 {
   fp_ctx_t ctx;
-  cy_fp_t fp_a, fp_b, fp_r;
+  cy_fp_t fp_a, fp_b, fp_apowp, fp_r;
   cy_error_t error = CY_OK;
+  uint8_t exported[_MAX_SIZE_TESTED_FP_T8];
+  uint8_t test_a[_MAX_SIZE_TESTED_FP_T8];
+  uint8_t test_b[_MAX_SIZE_TESTED_FP_T8];
+
+
+  size_t parameters_t8=(size_t) (argv[0][0]);
+
   /* The shared ram between program and library*/
+  debug_printf("\n @RAMP=%x\n sizeRamp=%x", (unsigned int)Ramp,(int)sizeRam);
 
-  debug_printf("\n @RAMP=%x", (unsigned int)Ramp);
-
-  memset(Ramp, 0x55, sizeRam);
   Print_RAMp(Ramp, sizeRam);
 
   CY_CHECK(cy_fp_init(&ctx, Ramp, sizeRam, argc, argv));
   printf("\n %s  : %s:", ctx.libname, name);
+  debug_printf("\n After init");
   Print_RAMp(Ramp, sizeRam);
 
-  debug_printf("\n end init");
 
-  CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_a));
-  CY_CHECK(cy_fp_import(secp384_r1_a, 48, &fp_a));
+  CY_CHECK(cy_fp_alloc(&ctx, parameters_t8, &fp_a));
+  CY_CHECK(cy_fp_import(secp384_r1_a, parameters_t8, &fp_a));
 
-  CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_b));
-  CY_CHECK(cy_fp_import(secp384_r1_b, 48, &fp_b));
+  CY_CHECK(cy_fp_alloc(&ctx, parameters_t8, &fp_b));
+  CY_CHECK(cy_fp_import(secp384_r1_b, parameters_t8, &fp_b));
 
-  CY_CHECK(cy_fp_alloc(&ctx, 48, &fp_r));
+  CY_CHECK(cy_fp_alloc(&ctx, parameters_t8, &fp_r));
   CY_CHECK(cy_fp_add(&fp_a, &fp_b, &fp_r));
+  CY_CHECK(cy_fp_export(&fp_r, exported, parameters_t8));
 
-  debug_printf("\n free");
+  /* We test simultaneously mul, add, sub and pow using a little fermat loop checking that a^p-a==0 with random input*/
+  /* TODO*/
+  /* We test simultaneously mul and inv by testing reciprocity */
+  /* TODO*/
+
+
+  debug_printf("\n After little fermat loop");
   Print_RAMp(Ramp, sizeRam);
 
   CY_CHECK(cy_fp_free(&fp_a));
   CY_CHECK(cy_fp_free(&fp_b));
   CY_CHECK(cy_fp_free(&fp_r));
+  debug_printf("\n after free");
+  Print_RAMp(Ramp, sizeRam);
+
   debug_printf("\n uninit");
 
   CY_CHECK(cy_fp_uninit(&ctx, Ramp, sizeRam));

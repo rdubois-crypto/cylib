@@ -16,8 +16,11 @@
 #ifndef _TEST_COMMON_TOOLS_H_
 #define _TEST_COMMON_TOOLS_H_
 
+/*activate this define for debug information*/
+//#define _DEBUG_BURRITOS
 
-#if !defined(_DEBUG_BURRITOS) && !defined(_TEST_ALL)
+
+#if (defined(_DEBUG_BURRITOS)) || (!defined(_TEST_ALL))
 
 
 #define debug_printf(...) printf ( __VA_ARGS__)
@@ -32,6 +35,20 @@ static void Print_RAMp(uint8_t *Ramp, size_t RAM_t8)
     if ((i & 0xf) == 15)
     	debug_printf("\n");
   }
+}
+
+
+static void debut_print_MsbString(uint8_t *String, size_t String_t8, char *prefix)
+{
+ size_t i;
+ debug_printf("%s", prefix);
+
+ for(i=0;i<String_t8;i++)
+ {
+	 debug_printf("0x%02X",String[i]);
+	 if ((i & 0xf) == 15)
+	     	debug_printf("\n");
+ }
 }
 
 #else
