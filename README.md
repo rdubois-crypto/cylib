@@ -12,10 +12,11 @@ An attempt to merge several different cryptographic libs into unified APIs:
 - etc.
 
 ## Why another cryptolib ?
-The framework is mainly intended to enable to switch primitives and accelerators (developper API) provided to higher level services (protocols and App, such as messenging, TLS, blockchain, NIST validation). The main observation comes from the fact that with unified API, the number of wrapper of n objects together would be reduced from O(n^2) to O(n) wrappers. Of course i don't want to let all the fun to others and some implementations are provided. I do not pretend to reach the skill of some of our best 'cryptodev wizards'.
+The framework is mainly intended to enable to switch primitives and accelerators (developper API) provided to higher level services (protocols and App, such as messenging, TLS, blockchain, NIST validation). The main observation comes from the fact that with unified API, the number of wrapper of n objects together would be reduced from O(n^2) to O(n) wrappers. Having unified API will also allow a unique binding from the API to rust (bind only once). 
 
 ![cylib](https://user-images.githubusercontent.com/103030189/178018785-ea4ea373-3eff-418f-a897-f205440740b8.png)
 
+ Of course i don't want to let all the fun to others and some implementations are provided. I do not pretend to reach the skill of some of our best 'cryptodev wizards'.
 
 ## How to integrate a library or an accelerator in CY_LIB ?
 
