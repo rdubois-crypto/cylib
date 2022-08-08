@@ -42,18 +42,27 @@ static void debut_print_MsbString(uint8_t *String, size_t String_t8, char *prefi
 {
  size_t i;
  debug_printf("%s", prefix);
+ if(String_t8==0) {
+	 debug_printf("{}");
+	 return;
+ }
+ debug_printf("{");
+ debug_printf(" 0x%02X",String[0]);
 
- for(i=0;i<String_t8;i++)
+ for(i=1;i<String_t8;i++)
  {
-	 debug_printf("0x%02X",String[i]);
+	 debug_printf(", 0x%02X",String[i]);
 	 if ((i & 0xf) == 15)
 	     	debug_printf("\n");
  }
+ debug_printf("}");
+
 }
 
 #else
 #define debug_printf(...) UNUSED(0)
 #define Print_RAMp(a,s) UNUSED(0)
+#define debut_print_MsbString(a,s,comment) UNUSED(0)
 #endif
 
 #endif

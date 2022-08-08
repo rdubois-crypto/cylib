@@ -146,6 +146,18 @@ cy_test_fp_t secp384_r1={
 
 };
 
+/* test reciprocity of import and export*/
+/* input : allocated fp (a,b,r)*/
+/* TODO*/
+int test_InversionFermatLoop(cy_fp_t *a, cy_fp_t *b, cy_fp_t *r)
+{
+  cy_error_t error = CY_OK;
+
+
+  end:
+	  return error;
+}
+
 int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t *Ramp, size_t sizeRam)
 {
   fp_ctx_t ctx;
@@ -168,18 +180,34 @@ int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t 
   debug_printf("\n After init");
   Print_RAMp(Ramp, sizeRam);
 
+  debug_printf("\n-Alloc and Import");
 
+  //printf("\n here offset=%d", (int) ctx.offset);
   CY_CHECK(cy_fp_alloc(&ctx, parameters_t8, &fp_a));
+  debug_printf("\n After 1 Alloc");
+   Print_RAMp(Ramp, sizeRam);
+
+  //printf("\n here offset=%d", (int) ctx.offset);
   CY_CHECK(cy_fp_import(secp384_r1_a, parameters_t8, &fp_a));
+  debug_printf("\n After 1 import");
+   Print_RAMp(Ramp, sizeRam);
 
   CY_CHECK(cy_fp_alloc(&ctx, parameters_t8, &fp_b));
   CY_CHECK(cy_fp_import(secp384_r1_b, parameters_t8, &fp_b));
 
   CY_CHECK(cy_fp_alloc(&ctx, parameters_t8, &fp_r));
+
+  debug_printf("\n-Add and export");
   CY_CHECK(cy_fp_add(&fp_a, &fp_b, &fp_r));
+  debug_printf("\n after add");
+  Print_RAMp(Ramp, sizeRam);
+
+
   CY_CHECK(cy_fp_export(&fp_r, exported, parameters_t8));
 
-  /* We test simultaneously mul, add, sub and pow using a little fermat loop checking that a^p-a==0 with random input*/
+  debut_print_MsbString(exported, parameters_t8, "\n Add result:\n");
+
+  /* We test simultaneously mul, add, sub and pow using a little fermat inversion loop checking that a^(p-2)-a^-1==0 with random input*/
   /* TODO*/
   /* We test simultaneously mul and inv by testing reciprocity */
   /* TODO*/
@@ -218,7 +246,7 @@ static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
 	 CY_CHECK(test_crypto_parameters(argv_bls381, 2, "bls12_381", Ramp, Ramp_t8));
 	 CY_CHECK(test_crypto_parameters(argv_sec384, 2, "secp384r1", Ramp, Ramp_t8));
 #endif
-	 //CY_CHECK(test_crypto_parameters( argv_sec256, 2, "sec256k1"));
+	 CY_CHECK(test_crypto_parameters( argv_sec256, 2, "sec256k1",  Ramp, Ramp_t8));
 	  end:
 	  return error;
 }

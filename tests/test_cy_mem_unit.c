@@ -33,6 +33,7 @@
 #include "innovation/cy_cryptolib.h"
 #include "test_common_tools.h"
 
+#define _EXAMPLE_T8 32
 
 int test_mem_minimal_example(cryptolib_ctx_t *i_cryptolib)
 {
@@ -46,13 +47,13 @@ int test_mem_minimal_example(cryptolib_ctx_t *i_cryptolib)
   printf("\n test_mem_minimal_example:");
 
   debug_printf("\n Allocating First Fp component space, @RAMP=%x", (unsigned int)i_cryptolib->mem_unit->Shared_Memory);
-  CY_CHECK(cy_mem_malloc(i_cryptolib->mem_unit, _MAX_MEMORY>>1, &FpZone));
+  CY_CHECK(cy_mem_malloc(i_cryptolib->mem_unit, _EXAMPLE_T8, &FpZone));
   debug_printf("\n returned malloc @=%x", (unsigned int) FpZone);
 
   Print_RAMp(Ramp,i_cryptolib->mem_unit->allocated_t8 );
 
   debug_printf("\n Freeing First Fp component space, @RAMP=%x", (unsigned int)Ramp);
-  CY_CHECK(cy_mem_free(i_cryptolib->mem_unit, FpZone, _MAX_MEMORY>>1));
+  CY_CHECK(cy_mem_free(i_cryptolib->mem_unit, FpZone, _EXAMPLE_T8));
 
   Print_RAMp(Ramp,i_cryptolib->mem_unit->allocated_t8 );
 
