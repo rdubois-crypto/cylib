@@ -37,12 +37,41 @@ def Conv_word(A, size_word):
 	print("};");
 	return M;	
 	
+#/*********** Simulating machine words ************/ 
+def Conv_word_LSB(A, size_word):
+	sizeA=ceil(log(A)/log(2))  
+	print("sizeA=",sizeA)
+	sizeM=ceil(sizeA/size_word)
+	print("sizeM=",sizeM)
+	M=copy(matrix(1, sizeM)[0])
+	
+	mask = 2^size_word-1
+	for i in [0..sizeM-1]:
+		M[i]= A 	& mask;
+		print("i=",hex(M[i]));
+		A = A >> size_word
+	return M;	
+	
+def Conv_word_MSB(A, size_word):
+	sizeA=ceil(log(A)/log(2))  
+	print("sizeA=",sizeA)
+	sizeM=ceil(sizeA/size_word)
+	print("sizeM=",sizeM)
+	M=copy(matrix(1, sizeM)[0])
+	
+	mask = 2^size_word-1
+	for i in [0..sizeM-1]:
+		M[sizeM-1-i]= A 	& mask;
+		print("i=",hex(M[i]));
+		A = A >> size_word
+	return M;	
+	
 #sec256k1 modulus
 n=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
 name="p_256k1"
 #precompute for a 128 bits emulation by 64 bit words
 res=precompute_montgomery_constants(n, 128);
-Conv_word(res[0], 64);
-Conv_word(res[1], 64);
+Conv_word_MSB(res[0], 8);
+Conv_word_MSB(res[1], 8);
 
 

@@ -42,14 +42,13 @@
 
 
 #if defined(_LIB256K1_BURRITOS)
-//#define _DEBUG_BURRITOS //still at work
-
 #include "innovation/cy_wrap_lib256k1_gda.h"
 #include "innovation/cy_wrap_lib256k1_cryptolib.h"
 #endif
 
-#include "test_cy_mem_unit.c"
-#include "test_wrap_fp.c"
+#include "innovation/cy_ec_const.h"
+#include "cy_test_mem_unit.c"
+#include "cy_test_wrap_fp.c"
 
 cy_error_t test_all(cryptolib_ctx_t *cryptolib)
 {
