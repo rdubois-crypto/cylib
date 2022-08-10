@@ -21,7 +21,7 @@ The framework is mainly intended to enable to switch primitives and accelerators
 ## How to make a good burritos ? (integrate a library or an accelerator in CY_LIB) ?
 
 <p align="center">
-  <img width="250"  "https://user-images.githubusercontent.com/103030189/183880347-1cd8ef1c-e4f2-439a-93e4-a1f65155b278.jpg" alt="drawing">
+  <img width="250"  src="https://user-images.githubusercontent.com/103030189/183880347-1cd8ef1c-e4f2-439a-93e4-a1f65155b278.jpg" alt="drawing">
 </p>
 
 
