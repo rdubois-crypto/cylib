@@ -25,8 +25,12 @@ Most of cryptographic accelerators implement modular field accelerations. This f
 According to the lib, various level of integration into CY_LIB is possible. One could choose to benefit from asm efficient prime field/elliptic curve implementation to benefit from high performances, then publish a code that could be reused by some HW manufacturer. The framework shall later enable fair performances benches of protocols. For instance, bolos provides elliptic curve computation, so is wrap at the cy_ec.h level, then reused to accelerate extensions fields computations. blst provides pairing computation over bls12, so can be directly mapped into cy_pairing.h level to build zkp protocols.
 
 ## Roadmap
-- define APIs
-- add emulations of vectorized integers as wrappers such as neon2sse.h and sse2neon.h 
+
+### Current priorities
+- finalize testing of prime fields integration of lib256k1 and bolos
+- Map bls12_381 blst extension fields and pairing computations into cy_fp2.h, cy_fp12.h and cy_pairing.h
+### TODO's 
+- add emulations of vectorized integers in arm style (uint8x4x32_t) as wrappers such as neon2sse.h and sse2neon.h 
 - generic Montgomery multiplier, adapted to any wordsize, including vectorized types and 128 bits multiplier (some hardware accelerators provide it).
 - road to zkp: generic pairings and polynomial commitments.
 
