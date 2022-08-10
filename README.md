@@ -22,7 +22,7 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 Most of cryptographic accelerators implement modular field accelerations. This function shall be wrapped as done for instance in cy_wrap_bolos_* files. For NDA reasons it is not possible to publish examples over the NESCRYPT (STM secure element), but it is an example of such cryptocoprocessor.
 
-According to the lib, various level of integration into CY_LIB is possible. One could choose to benefit from asm efficient prime field/elliptic curve implementation to benefit from high performances, then publish a code that could be reused by some HW manufacturer. The framework shall later enable fair performances benches of protocols.
+According to the lib, various level of integration into CY_LIB is possible. One could choose to benefit from asm efficient prime field/elliptic curve implementation to benefit from high performances, then publish a code that could be reused by some HW manufacturer. The framework shall later enable fair performances benches of protocols. For instance, bolos provides elliptic curve computation, so is wrap at the cy_ec.h level, then reused to accelerate extensions fields computations. blst provides pairing computation over bls12, so can be directly mapped into cy_pairing.h level to build zkp protocols.
 
 ## Roadmap
 - define APIs
