@@ -16,7 +16,7 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 ![cylib](https://user-images.githubusercontent.com/103030189/178018785-ea4ea373-3eff-418f-a897-f205440740b8.png)
 
- Of course i don't want to let all the fun to others and some implementations are provided. I do not pretend to reach the skill of some of our best 'cryptodev wizards'.
+ Of course i don't want to let all the fun to others and some implementations are provided as 'native' CY_LIB implementations. I do not pretend to reach the skill of some of our best 'cryptodev wizards'. Every code that is reused is clearly indicated in the related source file by the 'acknowledgment' mention.
 
 ## How to integrate a library or an accelerator in CY_LIB ?
 
