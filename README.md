@@ -18,7 +18,20 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
  Of course i don't want to let all the fun to others and some implementations are provided as 'native' CY_LIB implementations. I do not pretend to reach the skill of some of our best 'cryptodev wizards'. Every code that is reused is clearly indicated in the related source file by the 'acknowledgment' mention.
 
-## How to integrate a library or an accelerator in CY_LIB ?
+## How to make a good burritos ? (integrate a library or an accelerator in CY_LIB) ?
+
+|-----------|-----------------|--------------------|-----------|
+| API file  |   Description   |Possible            | Type      |
+|           |                 | wrap               |           |
+|-----------|-----------------|--------------------|-----------|
+| cy_fp.h   | Prime Fields    | cy_wrap_bolos_fp.c |  WRAP     |
+|           |                 |                    |           |
+|           |                 |                    |           |
+|-----------|-----------------|--------------------|-----------|
+| cy_fp2.h  | Quadratic Fields| cy_wrap_blst_fp2.c |   WRAP    |
+|           |                 | cy_quad.c          |   NATIVE  |
+|           |                 |                    |           |
+|-----------|-----------------|--------------------|-----------|
 
 Most of cryptographic accelerators implement modular field accelerations. This function shall be wrapped as done for instance in cy_wrap_bolos_* files. For NDA reasons it is not possible to publish examples over the NESCRYPT (STM secure element), but it is an example of such cryptocoprocessor.
 
