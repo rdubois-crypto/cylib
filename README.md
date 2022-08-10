@@ -20,12 +20,14 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 ## How to make a good burritos ? (integrate a library or an accelerator in CY_LIB) ?
 
-|  API file | Description      |               Possible Wrap              |     Type    |
-|:---------:|------------------|:----------------------------------------:|:-----------:|
-|  cy_fp.h  | Prime fields     | cy_wrap_bolos_fp.c                       |  WRAP   |  
-                                 cy_wrap_lib256k1_fp.c
-|  cy_fp2.h | Quadratic fields | cy_wrap_blst_fp2.c cy_quad.c             | WRAP NATIVE |
-| cy_fp12.h | Dodecaic fields  | cy_wrap_blst_fp12.c cy_2x3x2.c           | WRAP NATIVE |
+|  API file | Description      |     Possible Wrap           |     Type    |
+|:---------:|------------------|:---------------------------:|:-----------:|
+|  cy_fp.h  | Prime fields     | cy_wrap_bolos_fp.c          |  WRAP       |  
+|           |                  | cy_wrap_bolos_fp.c          |  WRAP       |  
+|  cy_fp2.h | Quadratic fields | cy_wrap_blst_fp2.c          |  WRAP       |
+|           | Quadratic fields | cy_quad.c                   |  NATIVE     |
+| cy_fp12.h | Dodecaic fields  | cy_wrap_blst_fp12.c         |  WRAP       |
+|           |                  | cy_2x3x2.c                  |  NATIVE     |
 
 Most of cryptographic accelerators implement modular field accelerations. This function shall be wrapped as done for instance in cy_wrap_bolos_* files. For NDA reasons it is not possible to publish examples over the NESCRYPT (STM secure element), but it is an example of such cryptocoprocessor.
 
