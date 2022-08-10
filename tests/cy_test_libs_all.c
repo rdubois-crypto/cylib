@@ -19,11 +19,6 @@
 #include <string.h>
 
 
-#include "innovation/cy_def.h"
-#include "innovation/cy_errors.h"
-#include "innovation/cy_memory_unit.h"
-#include "innovation/cy_gda_component.h"
-
 
 #define _TEST_ALL /* enable testing of all modules */
 
@@ -31,24 +26,23 @@
 /* debug or not*/
 //#define _DEBUG_BURRITOS
 
-/*Pick a burritos to be tested */
-//#define _BOLOS_BURRITOS /* bolos*/
-#define _LIB256K1_BURRITOS
-
-#if defined(_BOLOS_BURRITOS)
+/*
+#if defined(_FP_BOLOS_BURRITOS)
 #include "innovation/cy_wrap_bolos_gda.h"
 #include "innovation/cy_wrap_bolos_cryptolib.h"
 #endif
 
 
-#if defined(_LIB256K1_BURRITOS)
+#if defined(_FP_LIB256K1_BURRITOS)
 #include "innovation/cy_wrap_lib256k1_gda.h"
 #include "innovation/cy_wrap_lib256k1_cryptolib.h"
 #endif
+*/
 
-#include "innovation/cy_ec_const.h"
+#include "innovation/cy_configuration.h"
 #include "cy_test_mem_unit.c"
 #include "cy_test_wrap_fp.c"
+#include "cy_test_wrap_fp2.c"
 
 cy_error_t test_all(cryptolib_ctx_t *cryptolib)
 {
@@ -61,6 +55,8 @@ cy_error_t test_all(cryptolib_ctx_t *cryptolib)
 	/* initializing memory unit for the tests*/
 	CY_CHECK(cy_mem_malloc(cryptolib->mem_unit, _FP_ZONE_T8, &FpZone));
 	CY_CHECK(test_fp_unit(cryptolib->mem_unit->Shared_Memory, _FP_ZONE_T8));
+	CY_CHECK(test_fp2_unit(cryptolib->mem_unit->Shared_Memory, _FP_ZONE_T8));
+
 	CY_CHECK(cy_mem_free(cryptolib->mem_unit, FpZone, _FP_ZONE_T8));
 
 

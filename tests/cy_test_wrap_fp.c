@@ -7,49 +7,32 @@
  */
 /* See LICENSE file at the root folder of the project.
  */
-/* FILE: cy_wrap_fp_lib256k1.h
+/* FILE: cy_test_wrap_fp.c
  */
 /* 																			      */
 /* 																			      */
 /* DESCRIPTION: testing wrappers for modular arithmetic */
 /**********************************************************************************/
-
+#include <stdio.h>
 #include <malloc.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <string.h>
-
-#include <openssl/bn.h>
-#include <openssl/ec.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <stdint.h>
 
-
+#include "innovation/cy_configuration.h"
 #include "cy_test_common_tools.h"
 
-/* define one of the burritos only if defined as an autosufficient main*/
-#ifndef _TEST_ALL
-#define _BOLOS_BURRITOS
-#endif
 
 //#define _BOLOS_BURRITOS
-#ifdef _BOLOS_BURRITOS
-#include "bolos/cx_ec.h"
-#include "bolos/cxlib.h"
-#include "../../../src/innovation/cy_wrap_fp_bolos.h"
-
-#endif
-
-
 //#define _LIB256K1_BURRITOS
-#ifdef _LIB256K1_BURRITOS
-#include "../../../src/innovation/cy_wrap_fp_lib256k1.h"
-#endif
+
 
 #include "innovation/cy_ec_const.h"
 #include "innovation/cy_errors.h"
-
 #include "innovation/cy_fp.h"
+
 
 #define _MAX_SIZE_TESTED_FP_T8 48
 
@@ -95,13 +78,33 @@ uint8_t mod_expected[] = { 57,  165, 57,  230, 138, 185, 240, 26,
 /* We test simultaneously mul, add, sub and pow using a little fermat inversion loop checking that a^(p-2)-a^-1==0 with random input*/
 /* input : allocated fp (a,b,r)*/
 /* TODO*/
-int test_InversionFermatLoop(cy_fp_t *a, cy_fp_t *b, cy_fp_t *r)
+int test_InversionFermatLoop(fp_ctx_t *ctx)
 {
   cy_error_t error = CY_OK;
+  cy_fp_t fp_a, fp_b, fp_apowp, fp_r, fp_pm2, fp_am1, fp_temp;
+  uint8_t two[1]={2};
+  uint8_t one[1]={1};
 
   /* TODO*/
   /* We test simultaneously mul and inv by testing reciprocity */
   /* TODO*/
+  	 uint8_t exported[_MAX_SIZE_TESTED_FP_T8];
+  	  uint8_t test_a[_MAX_SIZE_TESTED_FP_T8];
+  	  uint8_t test_b[_MAX_SIZE_TESTED_FP_T8];
+
+  CY_CHECK(cy_fp_alloc(ctx, ctx->t8_modular, &fp_a));
+  CY_CHECK(cy_fp_alloc(ctx, ctx->t8_modular, &fp_b));
+  CY_CHECK(cy_fp_alloc(ctx, ctx->t8_modular, &fp_r));
+  CY_CHECK(cy_fp_alloc(ctx, ctx->t8_modular, &fp_am1));
+  CY_CHECK(cy_fp_alloc(ctx, ctx->t8_modular, &fp_temp));
+  CY_CHECK(cy_fp_alloc(ctx, ctx->t8_modular, &fp_pm2));
+
+  CY_CHECK(cy_fp_inv(&fp_a, &fp_am1));
+  CY_CHECK(cy_fp_import(two, 1, &fp_pm2));
+  CY_CHECK(cy_fp_sub(two, one, &fp_a));
+  //CY_CHECK(cy_fp_pow(two, 1, &fp_a));
+
+
 
   end:
 	  return error;
@@ -171,7 +174,7 @@ static cy_error_t test_fp_add(fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 }
 
 
-int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t *Ramp, size_t sizeRam)
+static int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t *Ramp, size_t sizeRam)
 {
   fp_ctx_t ctx;
 
@@ -219,7 +222,7 @@ static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
 	 //C_cx_secp384r1->argv,
     const uint8_t *argv_gen[]={NULL, NULL};
 
-    if(nb_supported>2) nb_supported=2;
+    if(nb_supported>4) nb_supported=4;
 
 	for(i=0;i<nb_supported;i++){
 

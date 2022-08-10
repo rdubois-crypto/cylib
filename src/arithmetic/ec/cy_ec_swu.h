@@ -17,8 +17,8 @@
  * https://eprint.iacr.org/2009/340.pdf*/
 /**********************************************************************************/
 
-#ifndef SRC_INNOVATION_CY_EC_SWU_H_
-#define SRC_INNOVATION_CY_EC_SWU_H_
+#ifndef CY_EC_SWU_H_
+#define CY_EC_SWU_H_
 
 
 #include <malloc.h>
