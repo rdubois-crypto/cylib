@@ -20,8 +20,10 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 ## How to make a good burritos ? (integrate a library or an accelerator in CY_LIB) ?
 
+<p align="center">
+  <img width="250"  "https://user-images.githubusercontent.com/103030189/183880347-1cd8ef1c-e4f2-439a-93e4-a1f65155b278.jpg" alt="drawing">
+</p>
 
-<img src="https://user-images.githubusercontent.com/103030189/183880347-1cd8ef1c-e4f2-439a-93e4-a1f65155b278.jpg" alt="drawing" width="200"/ class="center">
 
 Files are split into three categories: API, Native implementations and wrappers. Native implementations are either in the **external/** (for external libs) or  **src/** directory. API files are meant to be instanciated by a wrapper. The wrapper forces an implementation into the common interface (which could be a simple sequence of #define if the API are strictly equivalent at a permutation of arguments). Then by using the good #include sequence, the user may change from one implementation to another.
 
