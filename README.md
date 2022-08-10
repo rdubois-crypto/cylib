@@ -20,6 +20,9 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 ## How to make a good burritos ? (integrate a library or an accelerator in CY_LIB) ?
 
+
+<img src="https://user-images.githubusercontent.com/103030189/183880347-1cd8ef1c-e4f2-439a-93e4-a1f65155b278.jpg" alt="drawing" width="200"/ class="center">
+
 Files are split into three categories: API, Native implementations and wrappers. Native implementations are either in the **external/** (for external libs) or  **src/** directory. API files are meant to be instanciated by a wrapper. The wrapper forces an implementation into the common interface (which could be a simple sequence of #define if the API are strictly equivalent at a permutation of arguments). Then by using the good #include sequence, the user may change from one implementation to another.
 
 
@@ -35,8 +38,6 @@ Files are split into three categories: API, Native implementations and wrappers.
 Most of cryptographic accelerators implement modular field accelerations. An example of such wrapping for modular arithmetic is provided in cy_wrap_bolos_* files. For NDA reasons it is not possible to publish examples over the NESCRYPT (STM secure element), but it would be an example of a harware cryptocoprocessor. (We are currently adressing the ST component through the bolos interface).
 
 According to the lib, various level of integration into CY_LIB is possible. One could choose to benefit from asm efficient prime field/elliptic curve implementation to benefit from high performances, then publish a code that could be reused by some HW manufacturer.  For instance, bolos provides elliptic curve computation, so is wrap at the cy_ec.h level, then reused to accelerate extensions fields computations. blst provides pairing computation over bls12, so can be directly mapped into cy_pairing.h level to build zkp protocols. The framework shall later enable fair performances benches of protocols. It offers a possibility to benefit from all top protocols using a new accelerator by wrapping at the good level.  
-
-<img src="https://user-images.githubusercontent.com/103030189/183880347-1cd8ef1c-e4f2-439a-93e4-a1f65155b278.jpg" alt="drawing" width="200"/>
 
 ## Roadmap!
 
