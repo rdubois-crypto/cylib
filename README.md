@@ -22,7 +22,8 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 |  API file | Description      |               Possible Wrap              |     Type    |
 |:---------:|------------------|:----------------------------------------:|:-----------:|
-|  cy_fp.h  | Prime fields     | cy_wrap_bolos_fp.c cy_wrap_lib256k1_fp.c |  WRAP WRAP  |
+|  cy_fp.h  | Prime fields     | cy_wrap_bolos_fp.c                       |  WRAP   |  
+                                 cy_wrap_lib256k1_fp.c
 |  cy_fp2.h | Quadratic fields | cy_wrap_blst_fp2.c cy_quad.c             | WRAP NATIVE |
 | cy_fp12.h | Dodecaic fields  | cy_wrap_blst_fp12.c cy_2x3x2.c           | WRAP NATIVE |
 
