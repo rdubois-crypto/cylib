@@ -47,11 +47,11 @@ Please contact me.
 
 ## Related projects
 
-- https://github.com/ANSSI-FR/libecc : a generic ecc and general purpose cryptographic library developped by the french ANSSI
+- [LIBECC] https://github.com/ANSSI-FR/libecc : a generic ecc and general purpose cryptographic library developped by the french ANSSI
 - https://github.com/DLTcollab/sse2neon : A C/C++ header file that converts Intel SSE intrinsics to Arm/Aarch64 NEON intrinsics.
-- https://github.com/ElementsProject/secp256k1-zkp : Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1.
-- https://github.com/LedgerHQ/speculos : an emulator of the open device Nano which enables to developp for a secure element from Ledger
-- https://github.com/supranational/blst : implementation of bls12-381 curve
+- [SEC256K1-ZKP] https://github.com/ElementsProject/secp256k1-zkp : Optimized C library for ECDSA signatures and secret/public key operations on curve secp256k1.
+- [SPECULOS] https://github.com/LedgerHQ/speculos : an emulator of the open device Nano which enables to developp for a secure element from Ledger
+- [BLST] https://github.com/supranational/blst : implementation of bls12-381 curve
 - https://github.com/intel/ARM_NEON_2_x86_SSE/blob/master/NEON_2_SSE.h :A C/C++ header file that converts Arm/Aarch64 NEON intrinsics to Intel SSE intrinsics .
-- https://www.datasheetarchive.com/NESCRYPT-datasheet.html
+- [NESCRYPT] https://www.datasheetarchive.com/NESCRYPT-datasheet.html
 
