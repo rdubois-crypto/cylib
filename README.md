@@ -27,7 +27,6 @@ The framework is mainly intended to enable to switch primitives and accelerators
 
 Files are split into three categories: API, Native implementations and wrappers. Native implementations are either in the **external/** (for external libs) or  **src/** directory. API files are meant to be instanciated by a wrapper. The wrapper forces an implementation into the common interface (which could be a simple sequence of #define if the API are strictly equivalent at a permutation of arguments). Then by using the good #include sequence, the user may change from one implementation to another.
 
-
 <center>
 
 |  API file | Description      |     Possible Wrap           |     Type    |
@@ -38,8 +37,8 @@ Files are split into three categories: API, Native implementations and wrappers.
 |           | Quadratic fields | cy_quad.c                   |  NATIVE     |
 | cy_fp12.h | Dodecaic fields  | cy_wrap_blst_fp12.c         |  WRAP       |
 |           |                  | cy_2x3x2.c                  |  NATIVE     |
-
-<\center>
+Table : Instantiating arithmetic APIs of CY_LIB
+</center>
 
 Most of cryptographic accelerators implement modular field accelerations. An example of such wrapping for modular arithmetic is provided in cy_wrap_bolos_* files. For NDA reasons it is not possible to publish examples over the NESCRYPT (STM secure element), but it would be an example of a harware cryptocoprocessor. (We are currently adressing the ST component through the bolos interface).
 
