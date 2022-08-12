@@ -25,7 +25,12 @@
 #include "innovation/cy_gda_component.h"
 
 
-#ifndef _FP_UNIT_SELECTED
+/* if defined, this flag disable error control and parameters control for faster execution time (reduce security)*/
+//#define _NO_CONTROL
+
+
+
+//#ifndef _FP_UNIT_SELECTED
 /************** CHOOSE YOUR FP UNIT ****/
 /*Pick a burritos ingredient to be used for prime fields */
 #define _FP_BOLOS_BURRITOS /* bolos*/
@@ -33,6 +38,8 @@
 //#define _FP_LIBECC_BURRITOS /* libecc*/
 //#define _FP_CY_BURRITOS /* bolos*/
 //#define _FP_ENCLAVE_BURRITOS /* bolos-enclave*/
+/************** CHOOSE YOUR FP2 UNIT ****/
+
 
 
 #ifdef _FP_BOLOS_BURRITOS
@@ -53,24 +60,32 @@
 
 #ifdef _FP_LIBECC_BURRITOS
 #include "../../../src/innovation/cy_wrap_fp_libecc.h"
+#define _FP_UNIT_SELECTED
 #endif
 
 #ifdef _FP_CY_BURRITOS
 #include "../../../src/innovation/cy_mod.h"
+#define _FP_UNIT_SELECTED
 #endif
 
 #include "innovation/cy_fp.h"
-#include "innovation/cy_wrap_bolos_cryptolib.h"
 
 
-#endif /* _FP_UNIT_SELECTED*/
+//#endif /* _FP_UNIT_SELECTED*/
 /************** CHOOSE YOUR FP2 UNIT ****/
 #ifndef _FP2_UNIT_DISABLED
 
-
-
-
+#define _FP2_CY_BURRITOS
+#ifdef _FP2_CY_BURRITOS
+#include "innovation/cy_quad.h"
+#define _FP2_UNIT_SELECTED
 #endif
+
+#include "innovation/cy_fp2.h"
+
+#endif /*endif _FP2_UNIT_DISABLED*/
+
+#include "innovation/cy_wrap_bolos_cryptolib.h"
 
 #endif
 

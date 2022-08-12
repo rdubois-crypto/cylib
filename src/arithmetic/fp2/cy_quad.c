@@ -15,7 +15,9 @@
 /**********************************************************************************/
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
+#include <stdio.h> /* todo:to be removed*/
 #include "cy_configuration.h"
 #include "cy_quad.h"
 #include "cy_fp2.h"
@@ -40,21 +42,70 @@ cy_error_t cy_quad_init(quad_ctx_t *ps_ctx_quad, uint8_t *pu8_Mem,
     goto end;
   }
 
-
-  if(ps_ctx_quad->ctx->is_initialized!=CY_LIB_INITIALIZED)
+  if(ps_ctx_quad->ctx.is_initialized!=CY_LIB_INITIALIZED)
   {
-	  CY_CHECK(cy_fp_init(ps_ctx_quad->ctx, pu8_Mem, t8_Memory, argc, argv));
+	  CY_CHECK(cy_fp_init(&ps_ctx_quad->ctx, pu8_Mem, t8_Memory, argc, argv));
   }
 
-  /* not sure that it is useful*/
-  ps_ctx_quad->offset = ps_ctx_quad->ctx->offset;
 
+  strcpy(ps_ctx_quad->libname, CY_FP2_LIBNAME);
+
+  /* not sure that it is useful*/
+  ps_ctx_quad->offset = ps_ctx_quad->ctx.offset;
+
+  ps_ctx_quad->is_initialized=CY_LIB_INITIALIZED;
+    /*todo: test the quadratic residuosity of -1 mod p*/
 
 end:
   return error;
 }
 
+/* the syntax of initializer is an MSBString, starting with x fp value, ending with y fp_value*/
+cy_error_t cy_fp2_import(uint8_t *in, size_t fp2_t8, cy_fp2_t *out)
+{
+  fp_ctx_t *ctx_fp=(out->ctx_fp);
+  cy_error_t error = CY_KO;
 
+  CY_IS_INIT(ctx_fp);
+  if(fp2_t8!=2*ctx_fp->t8_modular){
+	  error=CY_ERR_LENGTH;
+	  goto end;
+  }
+
+  CY_CHECK(cy_fp_import(in, ctx_fp->t8_modular, out->x));
+  CY_CHECK(cy_fp_import(in+ctx_fp->t8_modular, ctx_fp->t8_modular, out->y));
+
+  end:
+    return error;
+}
+
+
+cy_error_t cy_quad_alloc(quad_ctx_t *ctx, size_t t8_r, cy_fp2_t *r)
+{
+  cy_error_t error = CY_KO;
+  fp_ctx_t *ctx_fp=&(ctx->ctx);
+
+  CY_IS_INIT(ctx);
+
+  r->ctx_quad = ctx;
+  r->ctx_fp = &ctx->ctx;
+  r->index=ctx_fp->offset;
+
+
+  r->x = (cy_fp_t *)(ctx_fp->Shared_Memory + ctx_fp->offset);
+  ctx_fp->offset+=sizeof(cy_fp_t);
+  CY_CHECK(cy_fp_alloc(ctx_fp, t8_r, r->x));
+
+  r->y = (cy_fp_t *)(ctx_fp->Shared_Memory + ctx_fp->offset);
+  ctx_fp->offset+=sizeof(cy_fp_t);
+  CY_CHECK(cy_fp_alloc(ctx_fp, t8_r, r->y));
+
+  ctx->offset=ctx_fp->offset;
+  error = CY_OK;
+
+end:
+  return error;
+}
 
 /*karatsuba like, assuming complex representation of quad extension, from mul_mont_384x of blst*/
 cy_error_t cy_quad_mul(const cy_quad_t *a, const cy_quad_t *b, cy_quad_t *ret)
@@ -146,21 +197,62 @@ end:
 }
 
 
+cy_error_t cy_quad_free(cy_fp2_t *r)
+{
+  size_t i;
+  cy_error_t error=CY_OK;
+  fp_ctx_t *ctx_fp = r->ctx_fp;
+
+
+  /* note that if a variable size of bn is planed in a library, the maximal size, or a cy_bn_getsize() will be required */
+
+
+  if (r->index ==  ctx_fp->offset) {
+	  ctx_fp->offset-=(sizeof(cy_fp_t));
+
+  }
+
+  CY_CHECK(cy_fp_free( r->y));
+
+  if (r->index ==  ctx_fp->offset) {
+	  ctx_fp->offset-=(sizeof(cy_fp_t));
+  }
+
+  CY_CHECK(cy_fp_free( r->x));
+
+
+  for(i=0;i<sizeof(cy_fp_t);i++)
+      {
+    	   *(ctx_fp->Shared_Memory+r->index+i)=_MEM_FP_RESERVED;
+    	   *(ctx_fp->Shared_Memory+r->index+sizeof(cy_bn_t)+sizeof(cy_fp_t)+i)=_MEM_FP_RESERVED;
+      }
+
+
+
+ goto end;
+
+  end:
+  return error;
+}
+
+
 cy_error_t cy_quad_uninit(quad_ctx_t *ps_ctx_quad, uint8_t *pu8_Mem,
                        const size_t t8_Memory)
 {
   cy_error_t error = CY_KO;
 
 
-  if(ps_ctx_quad->ctx->is_initialized!=CY_LIB_INITIALIZED)
+  if(ps_ctx_quad->ctx.is_initialized!=CY_LIB_INITIALIZED)
   {
 	  error = CY_ERR_UNIT;
 	   goto end;
   }
 
-  CY_CHECK(cy_fp_uninit(ps_ctx_quad->ctx, pu8_Mem, t8_Memory));
+  CY_CHECK(cy_fp_uninit(&ps_ctx_quad->ctx, pu8_Mem, t8_Memory));
   /* not sure that it is useful*/
-  ps_ctx_quad->offset = ps_ctx_quad->ctx->offset;
+  ps_ctx_quad->offset = ps_ctx_quad->ctx.offset;
+
+  ps_ctx_quad->ctx.is_initialized=CY_LIB_UNITIALIZED;
 
   UNUSED(pu8_Mem);
   UNUSED(t8_Memory);

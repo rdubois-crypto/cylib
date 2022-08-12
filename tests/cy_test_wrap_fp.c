@@ -217,12 +217,9 @@ static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
 
 	printf("\n nb supported curves=%d", nb_supported);
 
-	// const uint8_t *argv_bls381[] = { secp384r1_t8, C_cx_BLS12_381_G1_p };
-	 //const uint8_t *argv_sec384[] = { secp384r1_t8, C_cx_secp384r1_p };
-	 //C_cx_secp384r1->argv,
     const uint8_t *argv_gen[]={NULL, NULL};
 
-    if(nb_supported>4) nb_supported=4;
+    if(nb_supported>5) nb_supported=5;
 
 	for(i=0;i<nb_supported;i++){
 

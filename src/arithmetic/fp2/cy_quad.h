@@ -19,13 +19,18 @@
 #define CY_QUAD_H_
 
 
+#define CY_FP2_LIBNAME "<CY_LIB FP2 Module>"
+
+#define _HANDLED_FP2_MAX 8
+#define _FP2_ZONE_T8 (_HANDLED_FP2_MAX*(sizeof(cy_fp_t)*sizeof(cy_bn_t)))
+
 struct quad_ctx_s {
   cy_flag_t is_initialized;
   char libname[T8_MAX_LIBNAME];
   size_t offset;
 
   size_t t8_modular_p;
-  fp_ctx_t *ctx;
+  fp_ctx_t ctx;
 
   void *modular_p; /*pointer to modular context in Shared Memory*/
 };
@@ -37,19 +42,21 @@ struct cy_quad_s {
   cy_fp_t *y;
   fp_ctx_t *ctx_fp;
   quad_ctx_t *ctx_quad;
-
+  size_t index;
 };
 
 typedef struct cy_quad_s cy_quad_t;
 
 #define cy_fp2_t cy_quad_t
 #define fp2_ctx_t quad_ctx_t
+#define ctx_fp2 ctx_quad
 
 /* wrappers */
 
-#define cy_fp2_init(a, b, c, d, e) (cy_quad_init(a, b, c, d, e))
-#define cy_fp2_uninit(ctx, mem, size) (cy_quad_uninit(ctx, mem, size))
+#define cy_fp2_init(a, b, c, d, e)       (cy_quad_init(a, b, c, d, e))
+#define cy_fp2_uninit(ctx, mem, size)    (cy_quad_uninit(ctx, mem, size))
+#define cy_fp2_alloc(ctx,  fp2_t8, out)  (cy_quad_alloc(ctx,  fp2_t8, out))
+#define cy_fp2_import(in, s, out)        (cy_quad_import(in, s, out))
 
-
-
+#define cy_fp2_free( out)  (cy_quad_free( out))
 #endif /* SRC_INNOVATION_CY_QUAD_H_ */
