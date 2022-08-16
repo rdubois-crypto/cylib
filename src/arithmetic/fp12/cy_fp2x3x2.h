@@ -20,14 +20,41 @@
 #define CY_FP2X3X2_H_
 
 
+typedef cy_fp2_t cy_fp6_t[3];
+typedef cy_fp6_t cy_fp12_t[2];
+
+#define CY_FP12_LIBNAME "<CY_LIB FP12 Module>"
+
+
+struct fp2x3x2_ctx_s {
+  cy_flag_t is_initialized;
+  char libname[T8_MAX_LIBNAME];
+  size_t offset;
+
+  size_t t8_modular_p;
+  fp2_ctx_t ctx_quad;
+
+  void *modular_p; /*pointer to modular context in Shared Memory*/
+};
+
+typedef struct fp2x3x2_ctx_s fp2x3x2_ctx_t;
+
+
+#define fp12_ctx_t fp2x3x2_ctx_t
+
+
 /* TODO: revise initializer*/
 cy_error_t cy_fp2x3x2_init(fp12_ctx_t *ps_ctx_fp12, uint8_t *pu8_Mem,
                        const size_t t8_Memory, const int argc,
                        const uint8_t *argv[]);
 
 
-#define cy_fp12_init(ctx, pMem, t8_mem,  argc,argv) (cy_fp2x3x2_init(ctx, pMem, t8_mem,  argc,argv))
+#define fp12_ctx_t fp2x3x2_ctx_t
+typedef cy_fp2_t cy_fp6_t[3];
+typedef cy_fp6_t cy_fp12_t[2];
 
+#define cy_fp12_init(ctx, pMem, t8_mem,  argc,argv) (cy_fp2x3x2_init(ctx, pMem, t8_mem,  argc,argv))
+#define cy_fp12_uninit(ctx, pMem, t8_mem) (cy_fp2x3x2_uninit(ctx, pMem, t8_mem))
 
 
 #endif /* SRC_INNOVATION_CY_FP2X3X2_H_ */

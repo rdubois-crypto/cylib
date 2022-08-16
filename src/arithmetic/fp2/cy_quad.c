@@ -80,10 +80,11 @@ cy_error_t cy_fp2_import(uint8_t *in, size_t fp2_t8, cy_fp2_t *out)
 }
 
 
-cy_error_t cy_quad_alloc(quad_ctx_t *ctx, size_t t8_r, cy_fp2_t *r)
+cy_error_t cy_quad_alloc(quad_ctx_t *ctx, cy_fp2_t *r)
 {
   cy_error_t error = CY_KO;
   fp_ctx_t *ctx_fp=&(ctx->ctx);
+  size_t t8_r=ctx_fp->t8_modular;
 
   CY_IS_INIT(ctx);
 
@@ -196,6 +197,23 @@ end:
   return error;
 }
 
+cy_error_t cy_fp2_neg( const cy_fp2_t *a,  cy_fp2_t *out){
+	cy_error_t error = CY_KO;
+
+	  fp_ctx_t *ctx = a->ctx_fp;
+
+	  if (ctx->is_initialized != CY_LIB_INITIALIZED) {
+	    error = CY_ERR_UNIT;
+
+	    goto end;
+	  }
+
+	  CY_CHECK(cy_fp_neg(a->x, out->x));
+	  CY_CHECK(cy_fp_neg(a->y, out->y));
+
+	  end:
+	    return error;
+}
 
 cy_error_t cy_quad_free(cy_fp2_t *r)
 {
@@ -252,7 +270,7 @@ cy_error_t cy_quad_uninit(quad_ctx_t *ps_ctx_quad, uint8_t *pu8_Mem,
   /* not sure that it is useful*/
   ps_ctx_quad->offset = ps_ctx_quad->ctx.offset;
 
-  ps_ctx_quad->ctx.is_initialized=CY_LIB_UNITIALIZED;
+  ps_ctx_quad->ctx.is_initialized=CY_LIB_UNINITIALIZED;
 
   UNUSED(pu8_Mem);
   UNUSED(t8_Memory);

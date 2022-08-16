@@ -55,7 +55,7 @@ typedef struct cy_quad_s cy_quad_t;
 
 #define cy_fp2_init(a, b, c, d, e)       (cy_quad_init(a, b, c, d, e))
 #define cy_fp2_uninit(ctx, mem, size)    (cy_quad_uninit(ctx, mem, size))
-#define cy_fp2_alloc(ctx,  fp2_t8, out)  (cy_quad_alloc(ctx,  fp2_t8, out))
+#define cy_fp2_alloc(ctx,   out)  (cy_quad_alloc(ctx,   out))
 #define cy_fp2_import(in, s, out)        (cy_quad_import(in, s, out))
 
 #define cy_fp2_free( out)  (cy_quad_free( out))
