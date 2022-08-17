@@ -55,6 +55,9 @@ typedef cy_fp6_t cy_fp12_t[2];
 
 #define cy_fp12_init(ctx, pMem, t8_mem,  argc,argv) (cy_fp2x3x2_init(ctx, pMem, t8_mem,  argc,argv))
 #define cy_fp12_uninit(ctx, pMem, t8_mem) (cy_fp2x3x2_uninit(ctx, pMem, t8_mem))
-
+#define cy_fp12_inv(in, out) (cy_fp2x3x2_inv(in, out))
+#define cy_fp12set_zero(io) (cy_fp2x3x2_set_zero(io))
+#define cy_fp12_cyclotomic_sqr cy(a,b)_fp2x3x2_cyclotomic_sqr(a,b)
+#define cy_fp12_sqr(a,b) cy_fp2x3x2_sqr(a,b)
 
 #endif /* SRC_INNOVATION_CY_FP2X3X2_H_ */

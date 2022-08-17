@@ -11,7 +11,7 @@
 /*               										   		                  */
 /* 																			      */
 /* 																			      */
-/* DESCRIPTION: Library initialization and management API */
+/* DESCRIPTION: Bolos cryptolib wrapping */
 /**********************************************************************************/
 
 #include <stddef.h>
@@ -74,6 +74,9 @@ cy_error_t cy_wrap_bolos_uninit(cryptolib_ctx_t *i_cryptolib)
   }
   /* UnInitialization of gda*/
   (bolos_gda_component.GDA_UnInit(&bolos_gda_component));
+
+ // UNUSED(pu8_Mem);
+ // UNUSED(t8_Memory);
 
   error = CY_OK;
 end:

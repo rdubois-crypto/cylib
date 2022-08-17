@@ -16,8 +16,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
 #include <stdio.h> /* todo:to be removed*/
+
 #include "cy_configuration.h"
 #include "cy_quad.h"
 #include "cy_fp2.h"
@@ -79,6 +79,18 @@ cy_error_t cy_fp2_import(uint8_t *in, size_t fp2_t8, cy_fp2_t *out)
     return error;
 }
 
+cy_error_t cy_quad_copy(const cy_fp2_t *in, cy_fp2_t *out){
+	fp_ctx_t *ctx_fp=(out->ctx_fp);
+	cy_error_t error = CY_KO;
+
+    CY_IS_INIT(ctx_fp);
+
+    CY_CHECK(cy_fp_copy(in->x,  out->x));
+	CY_CHECK(cy_fp_copy(in->y,  out->y));
+
+	  end:
+	      return error;
+}
 
 cy_error_t cy_quad_alloc(quad_ctx_t *ctx, cy_fp2_t *r)
 {
@@ -106,6 +118,20 @@ cy_error_t cy_quad_alloc(quad_ctx_t *ctx, cy_fp2_t *r)
 
 end:
   return error;
+}
+
+cy_error_t cy_quad_set_zero(cy_fp2_t *out)
+{
+	 cy_error_t error = CY_KO;
+	 fp_ctx_t *ctx_fp=out->ctx_fp;
+
+    CY_IS_INIT(ctx_fp);
+
+    cy_fp_set_zero(out->x);
+    cy_fp_set_zero(out->y);
+
+    end:
+    return error;
 }
 
 /*karatsuba like, assuming complex representation of quad extension, from mul_mont_384x of blst*/
@@ -178,7 +204,7 @@ end:
 }
 
 
-cy_error_t cy_quad_sub(cy_quad_t *ret, const cy_quad_t *a, const cy_quad_t *b)
+cy_error_t cy_quad_sub( const cy_quad_t *a, const cy_quad_t *b, cy_quad_t *ret)
 {
   cy_error_t error = CY_KO;
 
@@ -197,7 +223,46 @@ end:
   return error;
 }
 
-cy_error_t cy_fp2_neg( const cy_fp2_t *a,  cy_fp2_t *out){
+
+
+/* Compute Quadratic inversion for field with -1 square with formulae:
+   * |out| = 1/(a + b*i) = a/(a^2+b^2) - b/(a^2+b^2)*i
+   */
+/* todo: reduce intermediate variables using out*/
+cy_error_t cy_quad_inv( const cy_fp2_t *in,  cy_fp2_t *out){
+	cy_error_t error = CY_KO;
+
+	cy_fp_t t0, t1;
+	fp_ctx_t *ctx = in->ctx_fp;
+	 size_t t8_r=ctx->t8_modular;
+
+	cy_fp_alloc(ctx,t8_r,  &t0);
+	cy_fp_alloc(ctx,t8_r,  &t1);
+
+	  if (ctx->is_initialized != CY_LIB_INITIALIZED) {
+	    error = CY_ERR_UNIT;
+
+	    goto end;
+	  }
+
+	  cy_fp_sqr(in->x, &t0);/* x^2*/
+	  cy_fp_sqr(in->y, &t1);/* y^2*/
+
+	  cy_fp_add(&t0, &t1, &t0);/* x^2+y^2*/
+	  cy_fp_inv(&t0, &t1);/* (x^2+y^2)^-1*/
+
+	  cy_fp_mul(in->x, &t1, out->x);
+	  cy_fp_mul(in->y, &t1, out->y);
+	  cy_fp_neg(out->y, out->y);
+
+	  cy_fp_free( &t0);
+	  cy_fp_free( &t1);
+
+	  end:
+	    return error;
+}
+
+cy_error_t cy_quad_neg( const cy_fp2_t *a,  cy_fp2_t *out){
 	cy_error_t error = CY_KO;
 
 	  fp_ctx_t *ctx = a->ctx_fp;

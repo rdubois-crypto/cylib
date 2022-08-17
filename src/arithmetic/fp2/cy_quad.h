@@ -54,9 +54,24 @@ typedef struct cy_quad_s cy_quad_t;
 /* wrappers */
 
 #define cy_fp2_init(a, b, c, d, e)       (cy_quad_init(a, b, c, d, e))
+
+#define cy_fp2_inv(a, b)       (cy_quad_inv(a, b))
+#define cy_fp2_copy(a, b)       (cy_quad_copy(a, b))
+
+
 #define cy_fp2_uninit(ctx, mem, size)    (cy_quad_uninit(ctx, mem, size))
 #define cy_fp2_alloc(ctx,   out)  (cy_quad_alloc(ctx,   out))
+
 #define cy_fp2_import(in, s, out)        (cy_quad_import(in, s, out))
+#define cy_fp2_set_zero(a) (cy_quad_set_zero(a))
+
+#define cy_fp2_add(in1, in2, out) (cy_quad_add(in1, in2, out))
+#define cy_fp2_sub(in1, in2, out) (cy_quad_sub(in1, in2, out))
+
+#define cy_fp2_mul(in1, in2, out) (cy_quad_mul(in1, in2, out))
+#define cy_fp2_sqr(in1,  out) (cy_quad_sqr(in1, out))
+
+#define cy_fp2_neg(in, out) (cy_quad_neg(in, out))
 
 #define cy_fp2_free( out)  (cy_quad_free( out))
 #endif /* SRC_INNOVATION_CY_QUAD_H_ */

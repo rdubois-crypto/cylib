@@ -73,7 +73,7 @@ _CY_API extern cy_error_t cy_to_fp( uint8_t *in, size_t fp_t8,  DATA_FORMAT how,
 _CY_API extern cy_error_t cy_from_fp( uint8_t *in, size_t fp_t8,  DATA_FORMAT how, cy_fp_t *out );
 _CY_API extern cy_error_t cy_fp_set_zero(cy_fp_t *out);
 _CY_API  extern cy_error_t cy_fp_set_one(cy_fp_t *out);
-_CY_API extern cy_error_t cy_fp_copy(cy_fp_t *out);
+_CY_API extern cy_error_t cy_fp_copy(const cy_fp_t *in, cy_fp_t *out);
 
 
 /* Arithmetic functions */
@@ -92,8 +92,9 @@ _CY_API extern cy_error_t cy_fp_sqrt( cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_pow( cy_fp_t *in, uint8_t *scalar, size_t scalar_t8, cy_fp_t *out); /* for library enabling Montgomery, you should use montgomery version*/
 
 /* Comparizons */
-_CY_API extern cy_error_t fp_iszero(const cy_fp_t *in, int *iszero);
-_CY_API extern cy_error_t fp_eq_or_opp(cy_fp_t *in1, cy_fp_t *in2, int *eq_or_opp);
+_CY_API extern cy_error_t cy_fp_isone(const cy_fp_t *in, int *iszero);
+_CY_API extern cy_error_t cy_fp_iszero(const cy_fp_t *in, int *iszero);
+_CY_API extern cy_error_t cy_fp_eq_or_opp(cy_fp_t *in1, cy_fp_t *in2, int *eq_or_opp);
 
 /* Montgomery representation handling */
 _CY_API extern cy_error_t cy_fp_mont_import(const uint8_t *in, size_t fp_t8, cy_fp_t *out);
@@ -101,6 +102,7 @@ _CY_API extern cy_error_t cy_fp_to_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_from_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_mult_mont( cy_fp_t *a, cy_fp_t *b, cy_fp_t *r);
 _CY_API extern cy_error_t cy_fp_pow_mont( cy_fp_t *in, uint8_t *scalar, size_t scalar_t8, cy_fp_t *out); /* for library enabling Montgomery, you should use montgomery version*/
+
 
 
 #endif /* API_CY_FP_H_ */

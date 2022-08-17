@@ -36,6 +36,7 @@ _CY_API extern cy_error_t cy_fp2_import(uint8_t *in, size_t fp2_t8,
 _CY_API extern cy_error_t cy_fp2_copy(const  cy_fp2_t *a,  cy_fp2_t *out);
 
 
+_CY_API extern cy_error_t cy_fp2_set_zero(cy_fp2_t *out);
 _CY_API extern cy_error_t cy_fp2_add(const cy_fp2_t *a, const cy_fp2_t *b,
                              cy_fp2_t *out);
 _CY_API extern cy_error_t cy_fp2_sub( const cy_fp2_t *a, const cy_fp2_t *b,
@@ -46,6 +47,7 @@ _CY_API extern cy_error_t cy_fp2_mul( const cy_fp2_t *a, const cy_fp2_t *b,
 _CY_API extern cy_error_t cy_fp2_sqr( const cy_fp2_t *in, cy_fp2_t *out_sqr);
 
 
+_CY_API extern cy_error_t cy_fp2_inv(const  cy_fp2_t *a,  cy_fp2_t *out);
 _CY_API extern cy_error_t cy_fp2_neg(const  cy_fp2_t *a,  cy_fp2_t *out);
 _CY_API extern cy_error_t cy_fp2_free(cy_fp2_t *fp2);
 
