@@ -191,6 +191,16 @@ static inline cy_error_t cy_fp6_mul( const cy_fp6_t a, const cy_fp6_t b, cy_fp6_
    return error;
 }
 
+cy_error_t cy_conjugate_fp12(cy_fp12_t *out)
+{
+	cy_error_t error;
+
+	CY_CHECK(cy_fp6_neg((*out)[1], (*out)[1]));
+
+	  end:
+	   return error;
+}
+
 static cy_error_t cy_fp6_sqr( const cy_fp6_t a, cy_fp6_t ret)
 {
 //  vec384x s0, m01, m12, s2;
@@ -305,7 +315,7 @@ static cy_error_t cy_fp6_sub(const cy_fp6_t a, const cy_fp6_t b, cy_fp6_t ret)
 
 
 
-static cy_error_t cy_fp6_neg( const cy_fp6_t a, cy_fp6_t ret)
+cy_error_t cy_fp6_neg( const cy_fp6_t a, cy_fp6_t ret)
 {
   cy_error_t error;
 //	neg_fp2(ret[0], a[0]);
@@ -331,6 +341,21 @@ cy_error_t cy_fp6_alloc(fp2_ctx_t *ctx_fp2, cy_fp6_t *a){
 				CY_CHECK(cy_fp2_alloc(ctx_fp2, &((*a)[j])) );
 			}
 
+	end:
+	  return error;
+}
+
+
+cy_error_t cy_fp2x6_alloc(fp2_ctx_t *ctx_fp2, cy_fp12_t *a){
+
+	cy_error_t error = CY_KO;
+	size_t i,j;
+
+	for(i=0;i<2;i++){
+	for(j=0; j<3 ; j++){
+				CY_CHECK(cy_fp2_alloc(ctx_fp2, &((*a)[i][j])) );
+			}
+	}
 	end:
 	  return error;
 }
@@ -380,8 +405,10 @@ cy_error_t cy_fp2x3x2_alloc(fp12_ctx_t *ps_ctx_fp12, cy_fp12_t *out)
 	cy_error_t error = CY_KO;
 	size_t i,j;
 
+
 	for(i=0;i<2;i++){
 		for(j=0; j<3 ; j++){
+			(*out)[0][0].ctx_quad=&ps_ctx_fp12->ctx_quad;
 			CY_CHECK(cy_fp2_alloc(&ps_ctx_fp12->ctx_quad, out[i][j]) );
 		}
 	}
@@ -878,7 +905,7 @@ static cy_error_t cy_fp6_inv(const cy_fp6_t a, cy_fp6_t ret)
 }
 
 
-cy_error_t cy_fp12_inv(const cy_fp12_t *a, cy_fp12_t *ret)
+cy_error_t cy_fp2x3x2_inv(const cy_fp12_t *a, cy_fp12_t *ret)
 {
 	cy_error_t error;
 	cy_fp6_t t0, t1;

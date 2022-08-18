@@ -83,11 +83,11 @@ _CY_API extern cy_error_t cy_fp_neg( cy_fp_t *a,  cy_fp_t *out);
 
 _CY_API extern cy_error_t cy_fp_inc(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_dec(cy_fp_t *in, cy_fp_t *out);
-_CY_API extern cy_error_t cy_fp_cmp(cy_fp_t *in1, cy_fp_t *in2, int *cmp);
+//_CY_API extern cy_error_t cy_fp_cmp(cy_fp_t *in1, cy_fp_t *in2, boolean_t *cmp);
 
 _CY_API extern cy_error_t cy_fp_mul(  cy_fp_t *a, cy_fp_t *b, cy_fp_t *r);
 _CY_API extern cy_error_t cy_fp_inv( cy_fp_t *in, cy_fp_t *out);
-_CY_API extern cy_error_t cy_fp_sqr( cy_fp_t *in, cy_fp_t *out);
+_CY_API extern cy_error_t cy_fp_sqr( const cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_sqrt( cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_pow( cy_fp_t *in, uint8_t *scalar, size_t scalar_t8, cy_fp_t *out); /* for library enabling Montgomery, you should use montgomery version*/
 

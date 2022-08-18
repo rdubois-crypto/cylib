@@ -23,6 +23,7 @@
 #include "cy_fp.h"
 #include "cy_quad.h"
 #include "cy_fp2.h"
+#include "cy_fp2x3x2.h"
 #include "cy_fp12.h"
 
 /*
@@ -335,7 +336,7 @@ cy_error_t cy_line_by_Px2(const cy_ecpoint_t *Px2, cy_fp6_t line)
 
 }
 
-#define cy_mul_by_xy00z0_fp12(a,b,c) return CY_NOT_IMPLEMENTED
+#define cy_mul_by_xy00z0_fp12(a,b,out) return CY_NOT_IMPLEMENTED
 
  cy_error_t cy_start_dbl_n( cy_ecfp2point_t T[],
                                         const cy_ecpoint_t Px2[], size_t n, cy_fp12_t *ret)
@@ -386,49 +387,64 @@ cy_error_t cy_line_by_Px2(const cy_ecpoint_t *Px2, cy_fp6_t line)
 		return error;
 }
 
-#ifdef implem
-static void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
-                                          const POINTonE1_affine P[], size_t n)
-{
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__<199901
-    POINTonE2 *T = alloca(n*sizeof(POINTonE2));
-    POINTonE1_affine *Px2 = alloca(n*sizeof(POINTonE1_affine));
-#else
-    POINTonE2 T[n];
-    POINTonE1_affine Px2[n];
-#endif
-    size_t i;
+#define cy_ecfp2_iszero(a,b) return CY_NOT_IMPLEMENTED
+#define cy_ec_iszero(a,b) return CY_NOT_IMPLEMENTED
+#define cy_fp2_set_one(a) return CY_NOT_IMPLEMENTED
 
-    if ((n == 1) && (vec_is_zero(&Q[0], sizeof(Q[0])) |
-                     vec_is_zero(&P[0], sizeof(P[0]))) ) {
+
+cy_error_t miller_loop_n( const cy_ecfp2point_t Q[],
+                                          const cy_ecpoint_t P[], size_t n, cy_fp12_t *ret)
+{
+	cy_error_t error;
+//    POINTonE2 T[n];
+//    POINTonE1_affine Px2[n];
+
+	cy_ecfp2point_t *T;
+	cy_ecpoint_t *Px2;
+	/* todo: allocation */
+	int iszero_c1, iszero_c2;
+	size_t i;
+
+	cy_ecfp2_iszero(Q[0].X, &iszero_c1);
+	cy_ec_iszero(P[0].X, &iszero_c2);
+
+
+
+    if ((n == 1) && (iszero_c1 |
+    		iszero_c2) ) {
         /*
          * Special case of infinite aggregated signature, pair the additive
          * group's identity with the multiplicative group's identity.
          */
-        vec_copy(ret, BLS12_381_Rx.p12, sizeof(vec384fp12));
-        return;
+
+    	cy_fp2_set_one(ret);
+    	error=CY_OK;
+        goto end;
     }
 
     for (i = 0; i < n; i++) {
         /* Move common expression from line evaluation to line_by_Px2.  */
-        add_fp(Px2[i].X, P[i].X, P[i].X);
-        neg_fp(Px2[i].X, Px2[i].X);
-        add_fp(Px2[i].Y, P[i].Y, P[i].Y);
+        cy_fp_add(P[i].X, P[i].X, Px2[i].X);
+        cy_fp_neg(Px2[i].X, Px2[i].X);
+        cy_fp_add( P[i].Y, P[i].Y, Px2[i].Y);
 
-        vec_copy(T[i].X, Q[i].X, 2*sizeof(T[i].X));
-        vec_copy(T[i].Z, BLS12_381_Rx.p2, sizeof(T[i].Z));
+        cy_fp2_copy( Q[i].X,(T[i]).X);
+        /* todo setone cy_fp2_copy( BLS12_381_Rx.p2, T[i].Z);*/
     }
 
     /* first step is ret = 1^2*line, which is replaced with ret = line  */
-    start_dbl_n(ret, T, Px2, n);                /* 0x2                  */
-    add_n_dbl_n(ret, T, Q, Px2, n, 2);          /* ..0xc                */
-    add_n_dbl_n(ret, T, Q, Px2, n, 3);          /* ..0x68               */
-    add_n_dbl_n(ret, T, Q, Px2, n, 9);          /* ..0xd200             */
-    add_n_dbl_n(ret, T, Q, Px2, n, 32);         /* ..0xd20100000000     */
-    add_n_dbl_n(ret, T, Q, Px2, n, 16);         /* ..0xd201000000010000 */
-    conjugate_fp12(ret);                /* account for z being negative */
+    cy_start_dbl_n( T, Px2, n, ret);                /* 0x2                  */
+    cy_add_n_dbl_n(  Q, Px2, n, 2, ret, T);          /* ..0xc                */
+    cy_add_n_dbl_n(  Q, Px2, n, 3, ret, T);          /* ..0x68               */
+    cy_add_n_dbl_n(  Q, Px2, n, 9, ret, T);          /* ..0xd200             */
+    cy_add_n_dbl_n(  Q, Px2, n, 32, ret, T);         /* ..0xd20100000000     */
+    cy_add_n_dbl_n(  Q, Px2, n, 16, ret, T);         /* ..0xd201000000010000 */
+    cy_fp12_conjugate(ret);                /* account for z being negative */
+
+    end:
+  		return error;
 }
-#endif
+
 
 /* todo: vérifier affine/proj*/
 static cy_error_t cy_pre_add_n_dbl(                                             const cy_ecfp2point_t *Q,
@@ -476,7 +492,8 @@ cy_error_t cy_precompute_lines( const cy_ecfp2point_t *Q, cy_fp6_t Qlines[68])
 		return error;
 }
 
-cy_error_t cy_post_line_by_Px2( const cy_fp6_t in,
+
+static cy_error_t cy_post_line_by_Px2( const cy_fp6_t in,
                                             const cy_ecpoint_t *Px2, cy_fp6_t out)
 {
 	cy_error_t error;
@@ -494,140 +511,223 @@ cy_error_t cy_post_line_by_Px2( const cy_fp6_t in,
   		return error;
 }
 
-#ifdef implem
-static void post_add_n_dbl(vec384fp12 ret, const vec384fp6 lines[],
-                           const POINTonE1_affine *Px2, size_t n)
+ cy_error_t cy_post_add_n_dbl( const cy_fp6_t lines[],
+                           const cy_ecpoint_t *Px2, size_t n, cy_fp12_t *ret)
 {
 	cy_fp6_t line;
+	fp2_ctx_t *ctx_fp2= (*ret)[0][0].ctx_quad;
+	cy_fp6_alloc(ctx_fp2, &line);
 
-    post_line_by_Px2(line, lines++[0], Px2);
-    mul_by_xy00z0_fp12(ret, ret, line);
+	//todo : allocation
+	cy_error_t error;
+
+    CY_CHECK(cy_post_line_by_Px2( lines++[0], Px2, line));
+    cy_mul_by_xy00z0_fp12(ret, line, ret);
     while (n--) {
-        sqr_fp12(ret, ret);
-        post_line_by_Px2(line, lines++[0], Px2);
-        mul_by_xy00z0_fp12(ret, ret, line);
+        cy_fp12_sqr(ret, ret);
+        cy_post_line_by_Px2( lines++[0], Px2, line);
+        cy_mul_by_xy00z0_fp12(ret, line,  ret);
     }
+    cy_fp6_alloc(ctx_fp2, &line);
+
+    end:
+  		return error;
 }
 
-static void miller_loop_lines(vec384fp12 ret, const vec384fp6 Qlines[68],
-                                              const POINTonE1_affine *P)
+ cy_error_t miller_loop_lines(const cy_fp6_t Qlines[68],
+                                              const cy_ecpoint_t *P, cy_fp12_t *ret)
 {
-    POINTonE1_affine Px2[1];
-    vec384fp6 line; /* it's not actual fp6, but 3 packed fp2, "xy00z0"  */
+	cy_ecpoint_t Px2;
+	cy_error_t error=CY_KO ;
+	/*todo: allocation*/
+	fp_ctx_t *ctx_fp= (*ret)[0][0].ctx_fp;
+	size_t t8_p=ctx_fp->t8_modular;
+	Px2.X=NULL;
+
+	cy_fp_alloc(ctx_fp,t8_p,  Px2.X);
+	cy_fp_alloc(ctx_fp,t8_p,  Px2.Y);
+
+    cy_fp6_t line; /* it's not actual fp6, but 3 packed fp2, "xy00z0"  */
 
     /* Move common expression from line evaluation to line_by_Px2. */
-    add_fp(Px2->X, P->X, P->X);
-    neg_fp(Px2->X, Px2->X);
-    add_fp(Px2->Y, P->Y, P->Y);
+    cy_fp_add( P->X, P->X, Px2.X);
+    cy_fp_neg(Px2.X, Px2.X);
+    cy_fp_add( P->Y, P->Y, Px2.Y);
 
     /* first step is ret = 1^2*line, which is replaced with ret = line  */
-    cy_post_line_by_Px2(line, Qlines[0], Px2);     /* 0x2                  */
-    cy_fp12_set_zero(&ret, sizeof(vec384fp12));
-    vec_copy(ret[0][0], line[0], 2*sizeof(vec384fp2));
-    vec_copy(ret[1][1], line[2], sizeof(vec384fp2));
-    post_add_n_dbl(ret, &Qlines[1],  Px2, 2);   /* ..0xc                */
-    post_add_n_dbl(ret, &Qlines[4],  Px2, 3);   /* ..0x68               */
-    post_add_n_dbl(ret, &Qlines[8],  Px2, 9);   /* ..0xd200             */
-    post_add_n_dbl(ret, &Qlines[18], Px2, 32);  /* ..0xd20100000000     */
-    post_add_n_dbl(ret, &Qlines[51], Px2, 16);  /* ..0xd201000000010000 */
-    conjugate_fp12(ret);                /* account for z being negative */
+    cy_post_line_by_Px2( Qlines[0], &Px2, line);     /* 0x2                  */
+    cy_fp12_set_zero(ret);
+    cy_fp2_copy(&line[0], &(*ret)[0][0]);
+    cy_fp2_copy( &((*ret)[1][1]), &line[2]);
+    cy_post_add_n_dbl( &Qlines[1],  &Px2, 2, ret);   /* ..0xc                */
+    cy_post_add_n_dbl( &Qlines[4],  &Px2, 3, ret);   /* ..0x68               */
+    cy_post_add_n_dbl( &Qlines[8],  &Px2, 9, ret);   /* ..0xd200             */
+    cy_post_add_n_dbl( &Qlines[18], &Px2, 32, ret);  /* ..0xd20100000000     */
+    cy_post_add_n_dbl( &Qlines[51], &Px2, 16, ret);  /* ..0xd201000000010000 */
+    cy_fp6_neg((*ret)[1], (*ret)[1]);                /* account for z being negative */
+
+    return error;
 }
 
-static void mul_n_sqr(vec384fp12 ret, const vec384fp12 a, size_t n)
+static void cy_mul_n_sqr( const cy_fp12_t *a,  size_t n, cy_fp12_t *ret)
 {
-    mul_fp12(ret, ret, a);
+    cy_fp12_mul( ret, a, ret);
     while (n--)
-        cyclotomic_sqr_fp12(ret, ret);
+    	cy_fp12_cyclotomic_sqr(ret, ret);
 }
 
-static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
+cy_error_t cy_raise_to_z_div_by_2( const cy_fp12_t *a, cy_fp12_t *ret)
 {
-    cyclotomic_sqr_fp12(ret, a);                /* 0x2                  */
-    mul_n_sqr(ret, a, 2);                       /* ..0xc                */
-    mul_n_sqr(ret, a, 3);                       /* ..0x68               */
-    mul_n_sqr(ret, a, 9);                       /* ..0xd200             */
-    mul_n_sqr(ret, a, 32);                      /* ..0xd20100000000     */
-    mul_n_sqr(ret, a, 16-1);                    /* ..0x6900800000008000 */
-    conjugate_fp12(ret);                /* account for z being negative */
+	cy_error_t error=CY_KO;
+
+	CY_CHECK(cy_fp12_cyclotomic_sqr( a, ret));                /* 0x2                  */
+	cy_mul_n_sqr( a, 2, ret);                       /* ..0xc                */
+	cy_mul_n_sqr( a, 3, ret);                       /* ..0xc                */
+	cy_mul_n_sqr( a, 9, ret);                       /* ..0xc                */
+	cy_mul_n_sqr( a, 32, ret);                       /* ..0xc                */
+	cy_mul_n_sqr( a, 16-1, ret);                       /* ..0xc                */
+	cy_fp12_conjugate(ret);                /* account for z being negative */
+
+	end:
+		return error;
 }
 
-#define raise_to_z(a, b) (raise_to_z_div_by_2(a, b), cyclotomic_sqr_fp12(a, a))
+#define cy_raise_to_z(a, b) (cy_raise_to_z_div_by_2(a, b), cy_fp12_cyclotomic_sqr(b, b))
+
+#define cy_fp12_frobenius_map(a,b,c) return CY_NOT_IMPLEMENTED ;
 
 /*
  * Adaptation from <zkcrypto>/pairing/src/bls12_381/mod.rs
  */
-static void final_exp(vec384fp12 ret, const vec384fp12 f)
+ cy_error_t final_exp( const cy_fp12_t *f, cy_fp12_t *ret)
 {
-    vec384fp12 y0, y1, y2, y3;
+	cy_error_t error;
+    cy_fp12_t y0, y1, y2, y3;
+    /* allocations*/
+   	fp2_ctx_t *ctx_fp2= ((*ret)[0][0]).ctx_quad;
 
-    vec_copy(y1, f, sizeof(y1));
-    conjugate_fp12(y1);
-    inverse_fp12(y2, f);
-    mul_fp12(ret, y1, y2);
-    frobenius_map_fp12(y2, ret, 2);
-    mul_fp12(ret, ret, y2);
+   	CY_CHECK(cy_fp2x6_alloc(ctx_fp2, &y0));
+   	cy_fp2x6_alloc(ctx_fp2, &y1);
+   	cy_fp2x6_alloc(ctx_fp2, &y2);
+   	cy_fp2x6_alloc(ctx_fp2, &y3);
 
-    cyclotomic_sqr_fp12(y0, ret);
-    raise_to_z(y1, y0);
-    raise_to_z_div_by_2(y2, y1);
-    vec_copy(y3, ret, sizeof(y3));
-    conjugate_fp12(y3);
-    mul_fp12(y1, y1, y3);
-    conjugate_fp12(y1);
-    mul_fp12(y1, y1, y2);
-    raise_to_z(y2, y1);
-    raise_to_z(y3, y2);
-    conjugate_fp12(y1);
-    mul_fp12(y3, y3, y1);
-    conjugate_fp12(y1);
-    frobenius_map_fp12(y1, y1, 3);
-    frobenius_map_fp12(y2, y2, 2);
-    mul_fp12(y1, y1, y2);
-    raise_to_z(y2, y3);
-    mul_fp12(y2, y2, y0);
-    mul_fp12(y2, y2, ret);
-    mul_fp12(y1, y1, y2);
-    frobenius_map_fp12(y2, y3, 1);
-    mul_fp12(ret, y1, y2);
+    cy_fp12_copy( f, &y1);
+    //conjugate_fp12(y1);
+    cy_fp12_conjugate(&y1);
+    // inverse_fp12(y2, f);
+    cy_fp12_inv(f, &y2);
+    // mul_fp12(ret, y1, y2);
+    cy_fp12_mul(&y1, &y2, ret);
+    // frobenius_map_fp12(y2, ret, 2);
+    cy_fp12_frobenius_map( ret, 2, &y2);
+    // mul_fp12(ret, ret, y2);
+    cy_fp12_mul(ret,& y2, ret);
+   // cyclotomic_sqr_fp12(y0, ret);
+    cy_fp12_cyclotomic_sqr( ret, &y0);
+    //raise_to_z(y1, y0);
+    cy_raise_to_z( &y0, &y1);
+    //raise_to_z_div_by_2(y2, y1);
+    cy_raise_to_z_div_by_2( &y1, &y2);
+
+    cy_fp12_copy( ret, &(y3));
+    cy_fp12_conjugate(&y3);
+
+    //mul_fp12(y1, y1, y3);
+    cy_fp12_mul( &y1, &y3, &y1);
+
+    //conjugate_fp12(y1);
+    cy_fp12_conjugate(&y1);
+
+    //mul_fp12(y1, y1, y2);
+    cy_fp12_mul(&y1, &y2, &y1);
+
+//    raise_to_z(y2, y1);
+    cy_raise_to_z(& y1, &y2);
+
+//    raise_to_z(y3, y2);
+    cy_raise_to_z(& y2, &y3);
+
+    //conjugate_fp12(y1);
+    cy_fp12_conjugate(&y1);
+
+//    mul_fp12(y3, y3, y1);
+    cy_fp12_mul(&y1, &y2, &y1);
+
+//    conjugate_fp12(y1);
+    cy_fp12_conjugate(&y1);
+
+   // frobenius_map_fp12(y1, y1, 3);
+    cy_fp12_frobenius_map(&y1, 3, &y1);
+
+//    frobenius_map_fp12(y2, y2, 2);
+    cy_fp12_frobenius_map(&y2, 2, &y2);
+
+//    mul_fp12(y1, y1, y2);
+    cy_fp12_frobenius_map(&y1, &y2, &y1);
+
+//    raise_to_z(y2, y3);
+    cy_raise_to_z(& y3, &y2);
+
+//    mul_fp12(y2, y2, y0);
+    cy_fp12_mul(&y2, &y0, &y2);
+
+//    mul_fp12(y2, y2, ret);
+    cy_fp12_mul(&y2, ret, &y2);
+
+//    mul_fp12(y1, y1, y2);
+    cy_fp12_mul(&y1, &y2, &y1);
+
+//    frobenius_map_fp12(y2, y3, 1);
+    cy_fp12_frobenius_map(& y3, 1, &y2);
+    //mul_fp12(ret, y1, y2);
+    cy_fp12_mul(&y1, &y2, ret);
+
+   	cy_fp12_free( &y0);
+   	cy_fp12_free( &y1);
+   	cy_fp12_free( &y2);
+   	cy_fp12_free( &y3);
+
+   	end:
+	return error;
 }
 
-void blst_miller_loop(vec384fp12 ret, const POINTonE2_affine *Q,
-                                      const POINTonE1_affine *P)
-{   miller_loop_n(ret, Q ? Q : (const POINTonE2_affine *)&BLS12_381_G2,
-                       P ? P : (const POINTonE1_affine *)&BLS12_381_G1, 1);
-}
 
-void blst_final_exp(vec384fp12 ret, const vec384fp12 f)
-{   final_exp(ret, f);   }
-
-void blst_precompute_lines(vec384fp6 Qlines[68], const POINTonE2_affine *Q)
-{   precompute_lines(Qlines, Q);   }
-
-void blst_miller_loop_lines(vec384fp12 ret, const vec384fp6 Qlines[68],
-                                            const POINTonE1_affine *P)
-{   miller_loop_lines(ret, Qlines, P);   }
-
-static bool_t is_cyclotomic(const vec384fp12 f)
+static cy_error_t cy_is_cyclotomic(const cy_fp12_t *f, boolean_t *res)
 {
-    vec384fp12 a, b;
+	cy_error_t error=CY_KO;
+    cy_fp12_t a, b;
+    cy_fp12_frobenius_map( f, 2, &a);
+    cy_fp12_frobenius_map( &a, 2, &b);
+    cy_fp12_mul(&b, f, &b);
 
-    frobenius_map_fp12(a, f, 2);
-    frobenius_map_fp12(b, a, 2);
-    mul_fp12(b, b, f);
+    cy_fp12_iseq(&a, &b, res);
 
-    return vec_is_equal(a, b, sizeof(a));
+    return error;
 }
 
-int blst_fp12_in_group(const vec384fp12 f)
+#define cy_fp12_iszero(a,b) return CY_NOT_IMPLEMENTED
+
+cy_error_t cy_fp12_in_group(const cy_fp12_t *f, int *res)
 {
-    vec384fp12 a, b;
+	cy_error_t error;
+	cy_fp12_t a, b;
 
-    if (vec_is_zero(f, sizeof(vec384fp12)) || !is_cyclotomic(f))
-        return 0;
+	CY_CHECK(cy_is_cyclotomic(f, res));
+	if(*res==CY_FALSE)
+		{
+			goto end;
+		}
+	cy_fp12_iszero(f, res);
+	if(*res==CY_FALSE)
+	{
+		goto end;
+	}
 
-    frobenius_map_fp12(a, f, 1);
-    raise_to_z(b, f);
+    cy_fp12_frobenius_map( f, 1,&a);
+    cy_raise_to_z( f, &b);
+    cy_fp12_iseq(&a, &b, res);
 
-    return (int)vec_is_equal(a, b, sizeof(a));
+    end:
+		return error;
+
 }
-#endif
