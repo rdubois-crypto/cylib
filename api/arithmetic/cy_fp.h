@@ -22,9 +22,10 @@
 #define _MEM_FP_RESERVED 0x55
 #define _MEM_FP_ALLOCATED 0x99
 
+#define _MAX_FP_T8 512 /* maximal byte size of a fp*/
 
 
-struct fp_ctx_s{
+struct cy_fp_ctx_s{
   cy_flag_t is_initialized;
   char libname[T8_MAX_LIBNAME];
   uint8_t *Shared_Memory;
@@ -36,7 +37,7 @@ struct fp_ctx_s{
 
 };
 
-typedef struct fp_ctx_s fp_ctx_t;
+typedef struct cy_fp_ctx_s cy_fp_ctx_t;
 
 
 struct cy_fp_s{
@@ -47,7 +48,7 @@ struct cy_fp_s{
   #endif
 
   size_t index; /* offset to the object with the allocated Memory*/
-  fp_ctx_t *ctx;
+  cy_fp_ctx_t *ctx;
 };
 
 
@@ -55,14 +56,14 @@ typedef struct cy_fp_s cy_fp_t;
 
 
 /* fp unit handling */
-_CY_API extern  cy_error_t cy_fp_init(fp_ctx_t *ps_ctx, uint8_t *pu8_SecMem , const size_t t8_Memory,
+_CY_API extern  cy_error_t cy_fp_init(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_SecMem , const size_t t8_Memory,
 		const int argc, const uint8_t *argv[]);
 
-_CY_API extern cy_error_t cy_fp_uninit(fp_ctx_t *ctx, uint8_t *pu8_SecMem , const size_t t8_Memory);
+_CY_API extern cy_error_t cy_fp_uninit(cy_fp_ctx_t *ctx, uint8_t *pu8_SecMem , const size_t t8_Memory);
 
 
 /* fp unit allocations */
-_CY_API extern cy_error_t cy_fp_alloc(fp_ctx_t *ps_ctx,  size_t fp_t8, cy_fp_t *out );
+_CY_API extern cy_error_t cy_fp_alloc(cy_fp_ctx_t *ps_ctx,  size_t fp_t8, cy_fp_t *out );
 _CY_API extern cy_error_t cy_fp_free(cy_fp_t *fp);
 
 
@@ -97,12 +98,13 @@ _CY_API extern cy_error_t cy_fp_iszero(const cy_fp_t *in, int *iszero);
 _CY_API extern cy_error_t cy_fp_eq_or_opp(cy_fp_t *in1, cy_fp_t *in2, int *eq_or_opp);
 
 /* Montgomery representation handling */
-_CY_API extern cy_error_t cy_fp_mont_import(const uint8_t *in, size_t fp_t8, cy_fp_t *out);
+_CY_API extern cy_error_t cy_fp_mont_import(const uint8_t *in, const size_t fp_t8, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_to_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_from_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_mult_mont( cy_fp_t *a, cy_fp_t *b, cy_fp_t *r);
 _CY_API extern cy_error_t cy_fp_pow_mont( cy_fp_t *in, uint8_t *scalar, size_t scalar_t8, cy_fp_t *out); /* for library enabling Montgomery, you should use montgomery version*/
 
-
+/*Access fields*/
+size_t size_field(cy_fp_ctx_t *ps_ctx);
 
 #endif /* API_CY_FP_H_ */

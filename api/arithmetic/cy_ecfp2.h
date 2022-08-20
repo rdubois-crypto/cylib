@@ -35,16 +35,14 @@ struct ecfp2_ctx_s {
 typedef struct ecfp2_ctx_s ecfp2_ctx_t;
 
 struct cy_ecfp2_s {
-  coord_t *coord;
+ _COORD_HEADER; /* the coordonates are defined by the EC_UNIT used*/
   boolean_t is_normalized = 0;
 
   uint8_t *index;
-#ifdef _jacobian
-  cy_fp_t *t;
-#endif
+
   ecfp2_ctx_t *ctx;
-  void *external_type;
 };
+
 
 typedef struct cy_ecfp2_s cy_ecpoint_t;
 

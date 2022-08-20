@@ -14,5 +14,8 @@
 /* DESCRIPTION: process the nist CAVP vectors, see description in  */
 /*https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program*/
 /**********************************************************************************/
+#include <stdio.h> /* required by fopen*/
+#include "cy_errors.h"
 
-extern cy_error_t cy_NIST_CAVP_process(FILE *f);
+extern cy_error_t cy_NIST_CAVP_process(FILE *f_in, FILE *f_out);
+

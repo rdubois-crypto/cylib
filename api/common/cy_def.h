@@ -11,7 +11,7 @@
  */
 /* 																			      */
 /* 																			      */
-/* DESCRIPTION: Elliptic curves  CY_LIB native implementation */
+/* DESCRIPTION:   CY_LIB common definitions */
 /**********************************************************************************/
 
 
@@ -20,6 +20,8 @@
 
 /* the max bytesize of a name (library, object, etc.)*/
 #define MAX_SIZENAME 32
+
+#define boolean_t int
 
 typedef  enum {
     MSB_STRING = 1, /* the most popular representation: data is ordered from MSB to LSB, ie 257 is {0x1, 0xff}*/
@@ -30,6 +32,19 @@ typedef  enum {
 	UNCOMPRESSED_MSB =6 /* uncompressed point */
 } DATA_FORMAT;
 
+/* this stipulates that the object is a CY_LIB native function */
+#define _CY_NATIVE
+
+/* this stipulates that the object is a CY_LIB wrapping function */
+#define _CY_WRAP
+
+/* this stipulates that the object is a CY_LIB API  */
+#define _CY_API
+
+/* headers definition */
+
+
+#define word32_from_be(a) (a[0] + (a[1] << 8) + (a[2] << 16) + (a[3] << 24))
 
 
 #endif /* SRC_INNOVATION_CY_DEF_H_ */

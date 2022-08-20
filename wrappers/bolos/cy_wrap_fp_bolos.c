@@ -25,7 +25,6 @@
 #include "cy_wrap_fp_bolos.h"
 #include "cy_fp.h"
 
-#define word32_from_be(a) (a[0] + (a[1] << 8) + (a[2] << 16) + (a[3] << 24))
 
 #define _2POWB                                                                 \
   {                                                                            \
@@ -99,9 +98,9 @@ cy_error_t cy_mont_to_montgomery(cx_bn_t x, const cx_bn_t z,
                                  const cy_bn_mont_ctx_t *ctx)
 {
   cx_err_t error = CY_KO;
-  cx_bn_t *p = (cx_bn_t *)ctx->n;
 
-  CY_CHECK(sys_cx_bn_mod_mul(x, ctx->h, z, *p));
+  CY_CHECK(sys_cx_bn_mod_mul(x, ctx->h, z, ctx->n));
+  goto end;
 
 end:
   return error;
@@ -272,7 +271,7 @@ end:
  * 2^(bitsizeof(word_t))
  */
 
-cy_error_t wrap_bolos_fp_init(fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
+cy_error_t wrap_bolos_fp_init(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
                               const size_t t8_Memory, const int argc,
                               const uint8_t *argv[])
 {
@@ -335,7 +334,7 @@ cy_error_t wrap_bolos_fp_init(fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
 }
 
 /* TODO: developp a container to import/export ciphered containers
-cy_error_t wrap_bolos_fp_write(fp_ctx_t *ctx, uint8_t *Mem
+cy_error_t wrap_bolos_fp_write(cy_fp_ctx_t *ctx, uint8_t *Mem
 __attribute__((unused)), int argc, uint8_t **argv)
 {
 
@@ -343,14 +342,14 @@ __attribute__((unused)), int argc, uint8_t **argv)
 }
 
 
-cy_error_t wrap_bolos_fp_read(fp_ctx_t *ctx, uint8_t *Mem
+cy_error_t wrap_bolos_fp_read(cy_fp_ctx_t *ctx, uint8_t *Mem
 __attribute__((unused)), int argc, uint8_t **argv)
 {
 
 
 }*/
 
-cy_error_t wrap_bolos_fp_alloc(fp_ctx_t *ctx, size_t t8_r, cy_fp_t *r)
+cy_error_t wrap_bolos_fp_alloc(cy_fp_ctx_t *ctx, size_t t8_r, cy_fp_t *r)
 {
   cy_error_t error = CY_KO;
 
@@ -379,7 +378,7 @@ end:
 cy_error_t wrap_bolos_fp_free(cy_fp_t *r)
 {
   size_t i;
-  fp_ctx_t *ctx = r->ctx;
+  cy_fp_ctx_t *ctx = r->ctx;
   for(i=0;i<sizeof(cx_bn_t *);i++)
   {
 	  *(ctx->Shared_Memory+r->index+i)=_MEM_FP_RESERVED;
@@ -398,7 +397,7 @@ cy_error_t wrap_bolos_fp_free(cy_fp_t *r)
 cy_error_t wrap_bolos_fp_import(const uint8_t *in, size_t t8_in, cy_fp_t *out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = out->ctx;
+  cy_fp_ctx_t *ctx = out->ctx;
   CY_IS_INIT(ctx);
 
   CX_CHECK(sys_cx_bn_init(*(out->bn), in, t8_in));
@@ -413,7 +412,7 @@ end:
 cy_error_t wrap_bolos_fp_copy(const cy_fp_t *in, cy_fp_t *out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = out->ctx;
+  cy_fp_ctx_t *ctx = out->ctx;
   CY_IS_INIT(ctx);
 
   CX_CHECK(sys_cx_bn_copy(*(out->bn), *(in->bn)));
@@ -427,7 +426,7 @@ end:
 cy_error_t wrap_bolos_fp_export(cy_fp_t *in, uint8_t *out , size_t t8_out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = in->ctx;
+  cy_fp_ctx_t *ctx = in->ctx;
 
   CY_IS_INIT(ctx);
 
@@ -440,7 +439,7 @@ end:
 cy_error_t wrap_bolos_fp_add(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = a->ctx;
+  cy_fp_ctx_t *ctx = a->ctx;
 
   CY_IS_INIT(ctx);
 
@@ -454,7 +453,7 @@ end:
 cy_error_t wrap_bolos_fp_neg( cy_fp_t *a,  cy_fp_t *out)
 {
 	 cy_error_t error = CY_KO;
-	  fp_ctx_t *ctx = a->ctx;
+	  cy_fp_ctx_t *ctx = a->ctx;
 
 	  CY_IS_INIT(ctx);
 	  CX_CHECK(cy_mod_neg(*(out->bn), *(a->bn),
@@ -466,7 +465,7 @@ cy_error_t wrap_bolos_fp_neg( cy_fp_t *a,  cy_fp_t *out)
 cy_error_t wrap_bolos_fp_sub(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = a->ctx;
+  cy_fp_ctx_t *ctx = a->ctx;
 
   CY_IS_INIT(ctx);
 
@@ -482,7 +481,7 @@ cy_error_t wrap_bolos_fp_cmp(const cy_fp_t *a, cy_fp_t *b, boolean_t *out)
 {
 
 	 cy_error_t error = CY_KO;
-	  fp_ctx_t *ctx = a->ctx;
+	  cy_fp_ctx_t *ctx = a->ctx;
 
 	  CY_IS_INIT(ctx);
 
@@ -495,7 +494,7 @@ cy_error_t wrap_bolos_fp_cmp(const cy_fp_t *a, cy_fp_t *b, boolean_t *out)
 cy_error_t wrap_bolos_fp_mul(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = a->ctx;
+  cy_fp_ctx_t *ctx = a->ctx;
 
   CY_IS_INIT(ctx);
 
@@ -522,7 +521,7 @@ cy_error_t wrap_bolos_fp_set_zero(cy_fp_t *out)
 cy_error_t wrap_bolos_fp_sqr(const cy_fp_t *a, cy_fp_t *out)
 {
 	 cy_error_t error = CY_KO;
-	  fp_ctx_t *ctx = a->ctx;
+	  cy_fp_ctx_t *ctx = a->ctx;
 
 	  CY_IS_INIT(ctx);
 
@@ -536,7 +535,7 @@ cy_error_t wrap_bolos_fp_sqr(const cy_fp_t *a, cy_fp_t *out)
 cy_error_t wrap_bolos_fp_inv(cy_fp_t *in, cy_fp_t *out)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = in->ctx;
+  cy_fp_ctx_t *ctx = in->ctx;
 
   CY_IS_INIT(ctx);
 
@@ -550,11 +549,10 @@ end:
 cy_error_t wrap_bolos_fp_mult_mont(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 {
 	 cy_error_t error = CY_KO;
-	  fp_ctx_t *ctx = a->ctx;
+	  cy_fp_ctx_t *ctx = a->ctx;
 
 
 	  CY_IS_INIT(ctx);
-
 	  CX_CHECK(cy_mont_mul(*(out->bn), *(a->bn), *(b->bn),
 	                             ((cy_bn_mont_ctx_t *)ctx->montgomery_ctx)));
 
@@ -568,7 +566,7 @@ cy_error_t wrap_bolos_fp_mult_mont(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 cy_error_t wrap_bolos_fp_to_mont(cy_fp_t *in, cy_fp_t *out_mont)
 {
   cy_error_t error = CY_KO;
-  fp_ctx_t *ctx = in->ctx;
+  cy_fp_ctx_t *ctx = in->ctx;
 
 
   CY_IS_INIT(ctx);
@@ -584,9 +582,9 @@ end:
 /* convert a montgomery representation in_mont to normalized out */
 cy_error_t wrap_bolos_fp_from_mont(cy_fp_t *in_mont, cy_fp_t *out){
 	cy_error_t error = CY_KO;
-	fp_ctx_t *ctx = in_mont->ctx;
+	cy_fp_ctx_t *ctx = in_mont->ctx;
 
-    CY_IS_INIT(ctx);
+   CY_IS_INIT(ctx);
 
 	CY_CHECK(
 	      cx_mont_from_montgomery(*(out->bn), *(in_mont->bn), ctx->montgomery_ctx));
@@ -595,8 +593,23 @@ cy_error_t wrap_bolos_fp_from_mont(cy_fp_t *in_mont, cy_fp_t *out){
 	  return error;
 }
 
+cy_error_t wrap_bolos_mont_import(const uint8_t *in, const size_t t8_in, cy_fp_t *out)
+{
+	cy_error_t error = CY_KO;
 
-cy_error_t wrap_bolos_fp_uninit(fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
+	cy_fp_ctx_t *ctx = out->ctx;
+
+	   CY_IS_INIT(ctx);
+
+
+	 CY_CHECK( wrap_bolos_fp_import(in, t8_in, out));
+	 CY_CHECK(	      cx_mont_to_montgomery(*(out->bn), *(out->bn), ctx->montgomery_ctx));
+
+	end:
+	  return error;
+}
+
+cy_error_t wrap_bolos_fp_uninit(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
                                 const size_t t8_Memory)
 {
   cy_error_t error = CY_KO;

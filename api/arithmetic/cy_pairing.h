@@ -33,9 +33,5 @@ _CY_API extern cy_error_t cy_pbc_pairing_asn1(cx_curve_t curve, unsigned char *P
                          unsigned char *P2, size_t P2_len,
                          const unsigned char *k, unsigned int k_len);
 
-#endif
 
-
-
-
-#endif /* SRC_INNOVATION_CY_PAIRING_H_ */
+#endif /* _CY_PBC_H */
