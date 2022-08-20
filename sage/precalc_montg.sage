@@ -8,18 +8,22 @@
 #/* DESCRIPTION: computation of Montgomery constants							   */
 #/**********************************************************************************/
 ####################################		
-def precompute_montgomery_constants(n, size):
+def precompute_montgomery_constants(name, n, sizeword, sizecurve):
+	print("Montgomery constants for",name)
 	Fp=FiniteField(n)
-	tn=ceil(ceil(log(n)/log(2))/size)
+	tn=ceil(sizecurve/sizeword)
 	print("tn=",tn)
-	R=(2^size)^tn;
-	n0=mod(-n, 2^size)^-1
-	Rm1 = Fp(2^size)^-1
+	R=(2^sizecurve);
+	n0=mod(-n, 2^sizeword)^-1
+	Rmodp = (Fp(2)^sizecurve)
 	
 	print("n0=", n0, hex(n0))
-	print("R^-1 =", Rm1, hex(Rm1))
+	print("2^size mod p =", Rmodp, hex(Rmodp))
+	#note that this constant is used in bolos, we can deduce that a montgomery reduction instead of an interleaved multiplication is used
+	print("2^(2*size mod p) =", Rmodp^2, hex(Rmodp^2))
+		
 	
-	return [lift(n0), lift(Rm1)];		
+	return [lift(n0), lift(Rmodp)];		
 	
 
 #/*********** Write as machine words ************/ 
@@ -62,7 +66,7 @@ def Conv_word_MSB(A, size_word):
 	mask = 2^size_word-1
 	for i in [0..sizeM-1]:
 		M[sizeM-1-i]= A 	& mask;
-		print("i=",hex(M[i]));
+		print("i=",hex(M[sizeM-1-i]));
 		A = A >> size_word
 	return M;	
 	
@@ -70,8 +74,32 @@ def Conv_word_MSB(A, size_word):
 n=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
 name="p_256k1"
 #precompute for a 128 bits emulation by 64 bit words
-res=precompute_montgomery_constants(n, 128);
-Conv_word_MSB(res[0], 8);
-Conv_word_MSB(res[1], 8);
+res=precompute_montgomery_constants(name, n, 128, 256);
+#Conv_word_MSB(res[0], 8);
+#Conv_word_MSB(res[1], 8);
+
+
+#sec256r1 modulus
+n=0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
+name="p_256r1"
+#precompute for a 128 bits emulation by 64 bit words
+res=precompute_montgomery_constants(name, n, 128, 256);
+#Conv_word_MSB(res[0], 8);
+#Conv_word_MSB(res[1], 8);
+
+
+#sec384 modulus
+n=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF
+name="p_384r1"
+
+res=precompute_montgomery_constants(name, n, 128, 384);
+
+#Fp:=GF(StringToInteger("ffffffff00000001000000000000000000000000ffffffffffffffffffffffff",16));
+#res:=(Fp!(2^256))^-1;
+#IntegerToString(Integers()!res,16);
+
+
+#Fp:=GF(StringToInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",16);
+
 
 
