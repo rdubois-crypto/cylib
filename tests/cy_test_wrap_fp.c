@@ -21,17 +21,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "innovation/cy_configuration.h"
-#include "cy_test_common_tools.h"
+#include "cy_configuration.h"
+#include "cy_ec_const.h"
+#include "cy_errors.h"
+#include "cy_fp.h"
 
-
-//#define _BOLOS_BURRITOS
-//#define _LIB256K1_BURRITOS
-
-
-#include "innovation/cy_ec_const.h"
-#include "innovation/cy_errors.h"
-#include "innovation/cy_fp.h"
+#include "cy_io_common_tools.h"
 
 
 #define _MAX_SIZE_TESTED_FP_T8 48
@@ -78,7 +73,7 @@ uint8_t mod_expected[] = { 57,  165, 57,  230, 138, 185, 240, 26,
 /* We test simultaneously mul, add, sub and pow using a little fermat inversion loop checking that a^(p-2)-a^-1==0 with random input*/
 /* input : allocated fp (a,b,r)*/
 /* TODO*/
-int test_InversionFermatLoop(fp_ctx_t *ctx)
+int test_InversionFermatLoop(cy_fp_ctx_t *ctx)
 {
   cy_error_t error = CY_OK;
   cy_fp_t fp_a, fp_b, fp_apowp, fp_r, fp_pm2, fp_am1, fp_temp;
@@ -111,16 +106,48 @@ int test_InversionFermatLoop(fp_ctx_t *ctx)
 }
 
 
-static cy_error_t test_fp_montgomery(fp_ctx_t *ctx)
+static cy_error_t test_fp_montgomery(cy_fp_ctx_t *ctx)
 {
 	cy_error_t error = CY_OK;
+
+	printf("\n Montgomery on 256k1:");
+	cy_fp_t fp_a, fp_b, fp_aR, fp_bR;
+	uint8_t res[32];
+	size_t parameters_t8= ctx->t8_modular;
+
+	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_a));
+
+
+	CY_CHECK(cy_fp_import(mod_a, parameters_t8, &fp_a));
+	CY_CHECK(cy_fp_export( (&fp_a), res, parameters_t8 ));
+	size_t i;
+
+
+	_debug(CY_CHECK(cy_io_fp_printMSB(&fp_a, "\n import/export of fp_a:")));
+	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_b));
+	CY_CHECK(cy_fp_import(mod_b, parameters_t8, &fp_b));
+
+
+	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_aR));
+
+	//CY_CHECK(cy_fp_mont_import(mod_a, parameters_t8, &fp_aR));
+
+	//printf("n aR=%x", (unsigned int )*fp_aR.bn);
+
+	//CY_CHECK(cy_fp_export( (ctx->montgomery_ctx), res, parameters_t8 ));
+
+
+
+	CY_CHECK(cy_fp_free(&fp_a));
+	CY_CHECK(cy_fp_free(&fp_aR));
+	CY_CHECK(cy_fp_free(&fp_b));
 
 
 	end:
 		  return error;
 }
 
-static cy_error_t test_fp_add(fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
+static cy_error_t test_fp_add(cy_fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 {
 	 cy_error_t error = CY_OK;
 	 cy_fp_t fp_a, fp_b, fp_apowp, fp_r;
@@ -134,12 +161,12 @@ static cy_error_t test_fp_add(fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 	  //printf("\n here offset=%d", (int) ctx.offset);
 	  CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_a));
 	  debug_printf("\n After 1 Alloc");
-	   Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 	  //printf("\n here offset=%d", (int) ctx.offset);
 	  CY_CHECK(cy_fp_import(mod_a, parameters_t8, &fp_a));
 	  debug_printf("\n After 1 import");
-	   Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 	  CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_b));
 	  CY_CHECK(cy_fp_import(mod_b, parameters_t8, &fp_b));
@@ -149,7 +176,7 @@ static cy_error_t test_fp_add(fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 	  debug_printf("\n-Add and export");
 	  CY_CHECK(cy_fp_add(&fp_a, &fp_b, &fp_r));
 	  debug_printf("\n after add");
-	  Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 
 	  CY_CHECK(cy_fp_export(&fp_r, exported, parameters_t8));
@@ -162,7 +189,7 @@ static cy_error_t test_fp_add(fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 	  CY_CHECK(cy_fp_free(&fp_b));
 	  CY_CHECK(cy_fp_free(&fp_r));
 	  debug_printf("\n after free");
-	  Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 
 	end: // printf("\n end crypto");
@@ -174,33 +201,38 @@ static cy_error_t test_fp_add(fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 }
 
 
-static int test_crypto_parameters(const uint8_t *argv[], int argc, char *name, uint8_t *Ramp, size_t sizeRam)
+static int test_crypto_parameters( char *name, uint8_t *Ramp, size_t sizeRam, cx_testvec_weierstrass_t const *C_cx_allCurves)
 {
-  fp_ctx_t ctx;
+  cy_fp_ctx_t ctx;
 
   cy_error_t error = CY_OK;
 
+  const uint8_t *argv_gen[]={NULL, NULL};
+  argv_gen[0]=C_cx_allCurves->t8_size;
+  argv_gen[1]=C_cx_allCurves->p;
 
-  size_t parameters_t8=(size_t) (argv[0][0]);
+  size_t parameters_t8=(size_t) (argv_gen[0][0]);
 
   /* The shared ram between program and library*/
   debug_printf("\n @RAMP=%x\n sizeRamp=%x", (unsigned int)Ramp,(int)sizeRam);
-  Print_RAMp(Ramp, sizeRam);
+  debug_Print_RAMp(Ramp, sizeRam);
 
   /* Initializing the fp unit*/
-  CY_CHECK(cy_fp_init(&ctx, Ramp, sizeRam, argc, argv));
+  CY_CHECK(cy_fp_init(&ctx, Ramp, sizeRam, 2, argv_gen));
   printf("\n %s  : %s:", ctx.libname, name);
   debug_printf("\n After init");
-  Print_RAMp(Ramp, sizeRam);
+  debug_Print_RAMp(Ramp, sizeRam);
 
   test_fp_add(&ctx, Ramp, sizeRam);
 
+  if(strcmp(name,"Curve sec256k1")==0)
+	  test_fp_montgomery(&ctx);
 
   /* Closing the fp unit*/
   debug_printf("\n uninit");
 
   CY_CHECK(cy_fp_uninit(&ctx, Ramp, sizeRam));
-  Print_RAMp(Ramp, sizeRam);
+  debug_Print_RAMp(Ramp, sizeRam);
 
 end:
   return error;
@@ -226,7 +258,7 @@ static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
 	    argv_gen[0]=C_cx_allCurves[i]->t8_size;
 	    argv_gen[1]=C_cx_allCurves[i]->p;
 
-	 CY_CHECK(test_crypto_parameters(argv_gen, 2, C_cx_allCurves[i]->curve_name, Ramp, Ramp_t8));
+	 CY_CHECK(test_crypto_parameters(C_cx_allCurves[i]->curve_name, Ramp, Ramp_t8, C_cx_allCurves[i]));
 	}
 
 	end:

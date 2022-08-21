@@ -18,10 +18,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "innovation/cy_def.h"
-#include "innovation/cy_errors.h"
-#include "innovation/cy_memory_unit.h"
-#include "innovation/cy_gda_component.h"
+#include "cy_def.h"
+#include "cy_errors.h"
+#include "cy_memory_unit.h"
+#include "cy_gda_component.h"
 
 
 #if defined(_BOLOS_BURRITOS) || !defined(_TEST_ALL)
@@ -30,8 +30,8 @@
 #endif
 
 
-#include "innovation/cy_cryptolib.h"
-#include "cy_test_common_tools.h"
+#include "cy_cryptolib.h"
+#include "cy_io_common_tools.h"
 
 #define _EXAMPLE_T8 32
 
@@ -50,12 +50,12 @@ int test_mem_minimal_example(cryptolib_ctx_t *i_cryptolib)
   CY_CHECK(cy_mem_malloc(i_cryptolib->mem_unit, _EXAMPLE_T8, &FpZone));
   debug_printf("\n returned malloc @=%x", (unsigned int) FpZone);
 
-  Print_RAMp(Ramp,i_cryptolib->mem_unit->allocated_t8 );
+  debug_Print_RAMp(Ramp,i_cryptolib->mem_unit->allocated_t8 );
 
   debug_printf("\n Freeing First Fp component space, @RAMP=%x", (unsigned int)Ramp);
   CY_CHECK(cy_mem_free(i_cryptolib->mem_unit, FpZone, _EXAMPLE_T8));
 
-  Print_RAMp(Ramp,i_cryptolib->mem_unit->allocated_t8 );
+  debug_Print_RAMp(Ramp,i_cryptolib->mem_unit->allocated_t8 );
 
 
 end:
@@ -95,13 +95,13 @@ int main()
 
   debug_printf("\n Starting lib, @RAMP=%x", (unsigned int)Ramp);
   CY_CHECK(cy_lib_init(&cryptolib_bolos, Ramp, sizeof(Ramp), NULL, 0));
-  Print_RAMp(Ramp, _MAX_MEMORY);
+  debug_Print_RAMp(Ramp, _MAX_MEMORY);
 
   test_mem_unit(&cryptolib_bolos);
 
   debug_printf("\n Closing lib, @RAMP=%x", (unsigned int)Ramp);
   CY_CHECK(cy_lib_uninit(&cryptolib_bolos));
-  Print_RAMp(Ramp, _MAX_MEMORY);
+  debug_Print_RAMp(Ramp, _MAX_MEMORY);
 
   end:
     if (error == CY_OK)

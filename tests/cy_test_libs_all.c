@@ -39,7 +39,8 @@
 #endif
 */
 
-#include "innovation/cy_configuration.h"
+#include "cy_configuration.h"
+#include "cy_quad.h"
 #include "cy_test_mem_unit.c"
 #include "cy_test_wrap_fp.c"
 #include "cy_test_wrap_fp2.c"
@@ -82,18 +83,18 @@ int main()
 
 	  printf("\n/************************ Test All modules*****************************************/");
 
-	  Print_RAMp(Ramp, sizeof(Ramp));
+	  debug_Print_RAMp(Ramp, sizeof(Ramp));
 
 	  printf("\n Starting lib, @RAMP=%x of size %d from total %d", (unsigned int)Ramp, sizeof(Ramp), _MAX_MEMORY);
 	  CY_CHECK(cy_lib_init(&cryptolib, Ramp, sizeof(Ramp), NULL, 0));
-	  Print_RAMp(Ramp, sizeof(Ramp));
+	  debug_Print_RAMp(Ramp, sizeof(Ramp));
 
 	  CY_CHECK(test_all(&cryptolib));
 
 	  printf("\n\n /************************ Closing lib memcheck:", (unsigned int)Ramp);
 	  debug_printf("\n @RAMP=%x \n offset=%d", (unsigned int)Ramp, cryptolib.mem_unit->offset);
 
-	  Print_RAMp(Ramp, sizeof(Ramp));
+	  debug_Print_RAMp(Ramp, sizeof(Ramp));
 
 	  CY_CHECK(cy_lib_uninit(&cryptolib));
 
@@ -102,7 +103,7 @@ int main()
 	      printf(" OK !\n");
 	    else
 	      printf(" KO\n");
- 	      Print_RAMp(Ramp, sizeof(Ramp));
+	    debug_Print_RAMp(Ramp, sizeof(Ramp));
 
 	    return error;
 }

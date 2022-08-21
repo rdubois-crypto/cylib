@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "cy_test_common_tools.h"
+#include "cy_io_common_tools.h"
 
 /* define here one of the burritos only if this file is defined as an autosufficient main*/
 #ifndef _TEST_ALL
@@ -33,12 +33,12 @@
 //#define _LIB256K1_BURRITOS
 
 
-#include "innovation/cy_ec_const.h"
-#include "innovation/cy_errors.h"
-#include "innovation/cy_fp.h"
+#include "cy_ec_const.h"
+#include "cy_errors.h"
+#include "cy_fp.h"
 
-#include "innovation/cy_quad.h"
-#include "innovation/cy_fp2.h"
+#include "cy_quad.h"
+#include "cy_fp2.h"
 
 
 uint8_t quad_a[] = { 172, 55,  63,  63,  189, 248, 237, 255, 103, 8,  115, 206, 227, 149, 169, 53,
@@ -65,12 +65,12 @@ static cy_error_t test_fp2_add(fp2_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 
 	  CY_CHECK(cy_fp2_alloc(ctx,  &fp_a));
 	  debug_printf("\n After 1 Alloc");
-	   Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 	  //printf("\n here offset=%d", (int) ctx.offset);
 	  CY_CHECK(cy_fp2_import(quad_a, 2*parameters_t8, &fp_a));
 	  debug_printf("\n After 1 import");
-	   Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 #ifdef loopi
 	  CY_CHECK(cy_fp2_alloc(ctx, parameters_t8, &fp_b));
@@ -81,7 +81,7 @@ static cy_error_t test_fp2_add(fp2_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 	  debug_printf("\n-Add and export");
 	//  CY_CHECK(cy_fp_add(&fp_a, &fp_b, &fp_r));
 	  debug_printf("\n after add");
-	  Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 
 	  CY_CHECK(cy_fp2_export(&fp_r, exported, parameters_t8));
@@ -97,7 +97,7 @@ static cy_error_t test_fp2_add(fp2_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 
 	  CY_CHECK(cy_fp2_free(&fp_a));
 	  debug_printf("\n after free");
-	  Print_RAMp(Ramp, sizeRam);
+	  debug_Print_RAMp(Ramp, sizeRam);
 
 	end: // printf("\n end crypto");
 	  if (error == CY_OK)
@@ -118,15 +118,16 @@ static int test_fp2_crypto_parameters(const uint8_t *argv[], int argc, char *nam
 
   /* The shared ram between program and library*/
   debug_printf("\n @RAMP=%x\n sizeRamp=%x", (unsigned int)Ramp,(int)sizeRam);
-  Print_RAMp(Ramp, sizeRam);
+  debug_Print_RAMp(Ramp, sizeRam);
 
   /* Initializing the fp unit*/
+  printf("\n enter fp2 init");
   CY_CHECK(cy_fp2_init(&ctx, Ramp, sizeRam, argc, argv));
   printf("\n %s  over %s: %s:", ctx.libname, ctx.ctx.libname, name);
 
 //  printf("\n %s  over %s: %s:", ctx.libname, ctx.ctx->libname, name);
   debug_printf("\n After init");
-  Print_RAMp(Ramp, sizeRam);
+  debug_Print_RAMp(Ramp, sizeRam);
 
   test_fp2_add(&ctx, Ramp, sizeRam);
 
@@ -135,7 +136,7 @@ static int test_fp2_crypto_parameters(const uint8_t *argv[], int argc, char *nam
   debug_printf("\n uninit");
 
   CY_CHECK(cy_fp2_uninit(&ctx, Ramp, sizeRam));
-  Print_RAMp(Ramp, sizeRam);
+  debug_Print_RAMp(Ramp, sizeRam);
 
 end:
   return error;

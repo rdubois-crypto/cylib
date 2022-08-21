@@ -95,11 +95,11 @@ cy_error_t wrap_lib256k1_fp_alloc(cy_fp_ctx_t *ctx, size_t t8_r, cy_fp_t *r)
  	error=CY_ERR_LENGTH;
  	goto end;
    }
-
   if (ctx->is_initialized != CY_LIB_INITIALIZED) {
     error = CY_ERR_UNIT;
     goto end;
   }
+
 
   r->ctx=ctx;
   r->is_initialized=CY_LIB_INITIALIZED;
@@ -188,7 +188,7 @@ end:
   return error;
 }
 
-cy_error_t wrap_lib256k1_fp_export(cy_fp_t *in, uint8_t *out, size_t t8_in)
+cy_error_t wrap_lib256k1_fp_export(const cy_fp_t *in, uint8_t *out, size_t t8_in)
 {
   cy_error_t error = CY_OK;
   cy_fp_ctx_t *ctx = in->ctx;

@@ -42,6 +42,8 @@
 
 /*****************************************************************************/
 /*	I. completing missing Speculos functions
+ * Those function are for Nano emulation only, use another library for a
+ * full software implementation (libECC for instance)
  */
 /*****************************************************************************/
 
@@ -227,6 +229,8 @@ cy_error_t cy_mont_init(cy_bn_mont_ctx_t *ctx, const cy_bn_t n)
       basis,
       (sizen << 3) - 1)); /*2^(sizeofp)-1 to fit in memory before reduction*/
   CX_CHECK(sys_cx_bn_mod_add(ctx->h, basis, basis, n)); /* 2^(bitsize(p))*/
+  CX_CHECK(sys_cx_bn_mod_mul(ctx->h, ctx->h, ctx->h, n)); /* 2^(bitsize(p))^2*/
+
 
   /* IV. Free*/
   sys_cx_bn_destroy(&temp);
@@ -423,7 +427,7 @@ end:
   return error;
 }
 
-cy_error_t wrap_bolos_fp_export(cy_fp_t *in, uint8_t *out , size_t t8_out)
+cy_error_t wrap_bolos_fp_export(const cy_fp_t *in, uint8_t *out , size_t t8_out)
 {
   cy_error_t error = CY_KO;
   cy_fp_ctx_t *ctx = in->ctx;

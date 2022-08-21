@@ -16,15 +16,28 @@
 
 /* this function must be instantiated for the target*/
 #define cy_print(...) printf(_VA_ARGS)
+
+#include <stdint.h>
+#include <stddef.h>
+
+#include <stdio.h>
+#include "cy_configuration.h"
 #include "cy_fp.h"
+#include "cy_io_common_tools.h"
 
 /* display the value of a fp in msb*/
-cy_error_t cy_io_fp_printMSB(const cy_fp_t *in)
+cy_error_t cy_io_fp_printMSB(const cy_fp_t *in, char *comment)
 {
   uint8_t display[_MAX_FP_T8];
 
   cy_error_t error=CY_KO;
-  CY_CHECK(cy_fp_export(in, in->ctx->t8_modular, display));
+  printf("\n here");
+  CY_CHECK(cy_fp_export(in,  display, in->ctx->t8_modular));
+  printf("\n here2");
+
+  print_MsbString(display,  in->ctx->t8_modular, comment );
+
+
 
   end:
   	  return error;
