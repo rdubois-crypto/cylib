@@ -54,16 +54,20 @@ According to the lib, various level of integration into CY_LIB is possible. One 
 - add emulations of vectorized integers in arm style (uint8x4x32_t) as wrappers such as neon2sse.h and sse2neon.h 
 - generic Montgomery multiplier, adapted to any wordsize, including vectorized types and 128 bits multiplier (some hardware accelerators provide it).
 - road to zkp: generic pairings and polynomial commitments.
+- provide functional Makefiles (I'm currently developping in a device emulator with additional constraints, the Makefile are ineffective)
 
-## Needed
-- An automated tool like clang-format, with only one possible output indentation (clang-format allow different representation of arrays, leading to possible git conflicts)
+### Crazy Ideas
+- wrap the Ethereum ASM in one of the wrapper to generate Ethereum EVM code without further development effort.
+- enable ciphering to host in the memory unit to extend a device implementation to host memory (no further application data space limitation in Nano)
+- do the same with executable code (no limitation of the size of executable code)
+
 
 ## Validation Strategy
 Ideally a sagemath implementation for each function shall be provided. When possible, a wrapper to NIST test vectors shall be provided.
 At some point this means that wrapping to the framework shall provide NIST CAVP without further effort to the primitives beneath the wrapper.
 
 ## Copyright and license
-Copyright (C) 2017-2022
+Copyright (C) <2022-End of time>
 
 This software is licensed under a dual BSD and GPL v2 license. See LICENSE file at the root folder of the project.
 
