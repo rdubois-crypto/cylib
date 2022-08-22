@@ -58,7 +58,7 @@ According to the lib, various level of integration into CY_LIB is possible. One 
 
 ### Crazy Ideas
 - wrap the Ethereum ASM in one of the wrapper to generate Ethereum EVM code without further development effort.
-- enable ciphering to host in the memory unit to extend a device implementation to host memory (no further application data space limitation in Nano)
+- enable ciphering to host in the memory unit to extend a device allocable memory to host memory (no further application data space limitation in Nano)
 - do the same with executable code (no limitation of the size of executable code)
 
 
