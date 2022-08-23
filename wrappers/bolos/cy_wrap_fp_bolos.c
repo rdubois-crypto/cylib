@@ -645,3 +645,26 @@ cy_error_t wrap_bolos_fp_uninit(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
 end:
   return error;
 }
+
+
+/*****************************************************************************/
+/*	III. Access to private fields methods
+ */
+/*****************************************************************************/
+
+cy_bn_t* wrap_bolos_get_fp_montgomery_constant1(cy_fp_t *in)
+{
+	cy_bn_t *res=NULL;
+	cy_fp_ctx_t *ctx = in->ctx;
+
+	if (ctx->is_initialized != CY_LIB_INITIALIZED) {
+	    goto end;
+	 }
+
+	cy_bn_mont_ctx_t *mont_ctx= (cy_bn_mont_ctx_t *) ctx->montgomery_ctx;
+	res=&mont_ctx->h;
+
+	end:
+	  return res;
+}
+

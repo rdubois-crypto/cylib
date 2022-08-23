@@ -28,8 +28,8 @@ struct ec_ctx_s {
   size_t t8_modular_p;
   size_t t8_modular_q;
 
-  void *modular_p; /*pointer to modular context in Shared Memory*/
-  void *modular_q; /*pointer to modular context in Shared Memory*/
+  cy_fp_ctx_t ctx_fp_p; /*pointer to modular context in Shared Memory*/
+  cy_fp_ctx_t ctx_fp_q; /*pointer to modular context in Shared Memory*/
 };
 
 typedef struct ec_ctx_s ec_ctx_t;

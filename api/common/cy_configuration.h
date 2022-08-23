@@ -33,8 +33,8 @@
 //#ifndef _FP_UNIT_SELECTED
 /************** CHOOSE YOUR FP UNIT ****/
 /*Pick a burritos ingredient to be used for prime fields */
-#define _FP_BOLOS_BURRITOS /* bolos*/
-//#define _FP_LIB256K1_BURRITOS /*lib256k1zkp*/
+//#define _FP_BOLOS_BURRITOS /* bolos*/
+#define _FP_LIB256K1_BURRITOS /*lib256k1zkp*/
 //#define _FP_LIBECC_BURRITOS /* libecc*/
 //#define _FP_CY_BURRITOS /* bolos*/
 //#define _FP_ENCLAVE_BURRITOS /* bolos-enclave*/

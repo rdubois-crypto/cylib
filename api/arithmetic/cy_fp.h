@@ -104,7 +104,12 @@ _CY_API extern cy_error_t cy_fp_from_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_mult_mont( cy_fp_t *a, cy_fp_t *b, cy_fp_t *r);
 _CY_API extern cy_error_t cy_fp_pow_mont( cy_fp_t *in, uint8_t *scalar, size_t scalar_t8, cy_fp_t *out); /* for library enabling Montgomery, you should use montgomery version*/
 
+#include "cy_gda_component.h"
+_CY_API extern cy_error_t cy_fp_get_random(cy_gda_ctx_t *gda, cy_fp_t *out );
+
+
 /*Access fields*/
-size_t size_field(cy_fp_ctx_t *ps_ctx);
+size_t   get_fp_size_field(cy_fp_ctx_t *ps_ctx);
+cy_fp_t* get_fp_montgomery_constant1(cy_fp_ctx_t *ps_ctx); /* return NULL if not handled, or a pointer to the field */
 
 #endif /* API_CY_FP_H_ */

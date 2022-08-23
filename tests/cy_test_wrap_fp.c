@@ -123,7 +123,7 @@ static cy_error_t test_fp_montgomery(cy_fp_ctx_t *ctx)
 	size_t i;
 
 
-	_debug(CY_CHECK(cy_io_fp_printMSB(&fp_a, "\n import/export of fp_a:")));
+	//CY_CHECK(cy_io_fp_printMSB(&fp_a, "\n import/export of fp_a:"));
 	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_b));
 	CY_CHECK(cy_fp_import(mod_b, parameters_t8, &fp_b));
 

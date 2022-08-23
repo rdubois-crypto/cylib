@@ -439,3 +439,16 @@ end:
   return error;
 }
 
+
+/*****************************************************************************/
+/*	II. Access to private fields methods
+ */
+/*****************************************************************************/
+/* no montgomery reduction with lib256k1, as a Solinas sparse reduction is used */
+cy_bn_t* wrap_lib256k1_get_fp_montgomery_constant1(cy_fp_t *in)
+{
+		  UNUSED(in);
+		  return NULL;
+}
+
+
