@@ -55,13 +55,17 @@ extern cy_error_t cy_ec_alloc(ec_ctx_t *ps_ctx, size_t ec_t8, cy_ec_t *out);
 extern cy_error_t cy_ec_import(ec_ctx_t *ps_ctx, uint8_t *in, size_t ec_t8,
                                cy_ec_t *out);
 extern cy_error_t cy_ec_add(ec_ctx_t *ctx, cy_ecpoint_t *a, cy_ec_t *b,
-                            cy_ec_t *r);
+		cy_ecpoint_t *r);
 
-extern cy_error_t cy_ec_sub(ec_ctx_t *ctx, cy_ec_t *a, cy_ec_t *b, cy_ec_t *r);
+extern cy_error_t cy_ec_scalarmult_fp( cy_ecpoint_t *P, cy_fp_t *k, cy_ecpoint_t *R);
 
-extern cy_error_t cy_ec_scalarmul_bn(cy_ec_t *a, cy_bn_t *b, cy_ec_t *r);
+extern cy_error_t cy_ec_scalarmult_MSBString(cy_ecpoint_t *a, cy_ecpoint_t *b, cy_ecpoint_t *r);
 
-extern cy_error_t cy_ec_free(cy_ec_t *ec);
+extern cy_error_t cy_ec_sub(cy_ecpoint_t *a, cy_ecpoint_t *b, cy_ecpoint_t *r);
+
+extern cy_error_t cy_ec_scalarmul_bn(cy_ecpoint_t *a, cy_bn_t *b, cy_ecpoint_t *r);
+
+extern cy_error_t cy_ec_free(cy_ecpoint_t *ec);
 
 extern cy_error_t cy_ec_uninit(ec_ctx_t *ctx, uint8_t *pu8_Mem,
                                const size_t t8_Memory);
