@@ -31,7 +31,7 @@ cy_error_t cy_linksig_verify_init(cy_linksig_ctx_t *ctx, cy_pk_t *secretkey, uin
 cy_error_t cy_linksig_verify_update(cy_linksig_ctx_t *ctx, cy_pk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
 cy_error_t cy_linksig_verify_final(cy_linksig_ctx_t *ctx, cy_pk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
 
-cy_error_t cy_linksig_link(cy_linksig_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *islinked);
+cy_error_t cy_linksig_link(cy_linksig_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, uint8_t *sig1, uint8_t *sig2, boolean_t *islinked);
 
 
 #endif /*LINKSIG */
