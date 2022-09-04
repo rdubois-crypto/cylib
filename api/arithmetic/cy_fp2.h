@@ -32,6 +32,7 @@ _CY_API extern cy_error_t cy_fp2_alloc(fp2_ctx_t *ps_ctx, cy_fp2_t *out);
 _CY_API extern cy_error_t cy_fp2_import(uint8_t *in, size_t fp2_t8,
                                 cy_fp2_t *out);
 
+_CY_API extern cy_error_t cy_fp2_export(const cy_fp2_t *in, uint8_t *out , size_t t8_out);
 
 _CY_API extern cy_error_t cy_fp2_copy(const  cy_fp2_t *a,  cy_fp2_t *out);
 

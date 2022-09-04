@@ -72,6 +72,7 @@ typedef struct cy_quad_s cy_quad_t;
 #define cy_fp2_sqr(in1,  out) (cy_quad_sqr(in1, out))
 
 #define cy_fp2_neg(in, out) (cy_quad_neg(in, out))
+#define cy_fp2_export(in, out, size) (cy_quad_export(in, out, size))
 
 #define cy_fp2_free( out)  (cy_quad_free( out))
 #endif /* SRC_INNOVATION_CY_QUAD_H_ */

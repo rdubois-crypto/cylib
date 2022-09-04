@@ -32,7 +32,7 @@ struct ec_ctx_s {
   cy_fp_ctx_t ctx_fp_q; /*pointer to modular context in Shared Memory*/
 };
 
-typedef struct ec_ctx_s ec_ctx_t;
+typedef struct ec_ctx_s cy_ec_ctx_t;
 
 struct cy_ec_s {
   _COORD_HEADER;
@@ -47,14 +47,14 @@ struct cy_ec_s {
 
 typedef struct cy_ec_s cy_ecpoint_t;
 
-extern cy_error_t cy_ec_init(ec_ctx_t *ps_ctx, uint8_t *pu8_Mem,
+extern cy_error_t cy_ec_init(cy_ec_ctx_t *ps_ctx, uint8_t *pu8_Mem,
                              const size_t t8_Memory, const int argc,
                              const uint8_t *argv[]);
 
-extern cy_error_t cy_ec_alloc(ec_ctx_t *ps_ctx, size_t ec_t8, cy_ec_t *out);
-extern cy_error_t cy_ec_import(ec_ctx_t *ps_ctx, uint8_t *in, size_t ec_t8,
+extern cy_error_t cy_ec_alloc(cy_ec_ctx_t *ps_ctx, size_t ec_t8, cy_ec_t *out);
+extern cy_error_t cy_ec_import(cy_ec_ctx_t *ps_ctx, uint8_t *in, size_t ec_t8,
                                cy_ec_t *out);
-extern cy_error_t cy_ec_add(ec_ctx_t *ctx, cy_ecpoint_t *a, cy_ec_t *b,
+extern cy_error_t cy_ec_add(cy_ec_ctx_t *ctx, cy_ecpoint_t *a, cy_ec_t *b,
 		cy_ecpoint_t *r);
 
 extern cy_error_t cy_ec_scalarmult_fp( cy_ecpoint_t *P, cy_fp_t *k, cy_ecpoint_t *R);

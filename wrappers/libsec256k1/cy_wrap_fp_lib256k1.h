@@ -50,5 +50,8 @@
 #define cy_fp_alloc(c, s, r) (wrap_lib256k1_fp_alloc(c, s, r))
 #define cy_fp_free(fp) (wrap_lib256k1_fp_free(fp))
 
+#define get_fp_montgomery_constant1(p_ctx_fp) (wrap_lib256k1_get_fp_montgomery_constant1(p_ctx_fp))
+
+#define cy_bn_export(in, out, size)
 
 #endif /* SRC_INNOVATION_CY_WRAP_FP_LIB256K1_H_ */

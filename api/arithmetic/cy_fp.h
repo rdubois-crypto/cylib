@@ -69,6 +69,8 @@ _CY_API extern cy_error_t cy_fp_free(cy_fp_t *fp);
 
 /* IO handling */
 _CY_API extern cy_error_t cy_fp_import( const uint8_t *in, size_t fp_t8, cy_fp_t *out );
+_CY_API extern cy_error_t cy_fp_from_bn( const cy_bn_t *in, cy_fp_t *out );
+
 _CY_API extern cy_error_t cy_fp_export(const cy_fp_t *in, uint8_t *out , size_t t8_out);
 _CY_API extern cy_error_t cy_to_fp( uint8_t *in, size_t fp_t8,  DATA_FORMAT how, cy_fp_t *out );
 _CY_API extern cy_error_t cy_from_fp( uint8_t *in, size_t fp_t8,  DATA_FORMAT how, cy_fp_t *out );
@@ -99,6 +101,8 @@ _CY_API extern cy_error_t cy_fp_eq_or_opp(cy_fp_t *in1, cy_fp_t *in2, int *eq_or
 
 /* Montgomery representation handling */
 _CY_API extern cy_error_t cy_fp_mont_import(const uint8_t *in, const size_t fp_t8, cy_fp_t *out);
+_CY_API extern cy_error_t cy_fp_mont_export(const cy_fp_t *in, uint8_t *out , size_t t8_out);
+
 _CY_API extern cy_error_t cy_fp_to_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_from_mont(cy_fp_t *in, cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_mult_mont( cy_fp_t *a, cy_fp_t *b, cy_fp_t *r);
@@ -107,9 +111,9 @@ _CY_API extern cy_error_t cy_fp_pow_mont( cy_fp_t *in, uint8_t *scalar, size_t s
 #include "cy_gda_component.h"
 _CY_API extern cy_error_t cy_fp_get_random(cy_gda_ctx_t *gda, cy_fp_t *out );
 
-
 /*Access fields*/
 size_t   get_fp_size_field(cy_fp_ctx_t *ps_ctx);
-cy_fp_t* get_fp_montgomery_constant1(cy_fp_ctx_t *ps_ctx); /* return NULL if not handled, or a pointer to the field */
-
+_CY_API extern cy_bn_t* cy_get_fp_montgomery_constant1(const cy_fp_ctx_t *ps_ctx); /* return NULL if not handled, or a pointer to the field */
+_CY_API extern cy_bn_t* cy_get_fp_montgomery_constant2(const cy_fp_ctx_t *ps_ctx); /* return NULL if not handled, or a pointer to the field */
+_CY_API extern cy_bn_t* cy_get_fp_montgomery_one(const cy_fp_ctx_t *ps_ctx);
 #endif /* API_CY_FP_H_ */

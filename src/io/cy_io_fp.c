@@ -31,9 +31,8 @@ cy_error_t cy_io_fp_printMSB(const cy_fp_t *in, char *comment)
   uint8_t display[_MAX_FP_T8];
 
   cy_error_t error=CY_KO;
-  printf("\n here");
+
   CY_CHECK(cy_fp_export(in,  display, in->ctx->t8_modular));
-  printf("\n here2");
 
   print_MsbString(display,  in->ctx->t8_modular, comment );
 
@@ -42,6 +41,7 @@ cy_error_t cy_io_fp_printMSB(const cy_fp_t *in, char *comment)
   end:
   	  return error;
 }
+
 
 /* display the raw montgomery value of a fp in msb*/
 

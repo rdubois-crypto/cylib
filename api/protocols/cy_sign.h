@@ -23,15 +23,22 @@
 
 cy_error_t cy_sign_init(cy_sign_ctx_t *ctx,  sign_role_t role, uint8_t *datainit, size_t m_t8);
 
+/* a one shot computation of the Signature computation*/
 cy_error_t cy_sign_proove_all(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *nonce, uint8_t *message, size_t m_t8, uint8_t *out);
-cy_error_t cy_sign_proove_init(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *nonce,uint8_t *message, size_t m_t8, uint8_t *out);
-cy_error_t cy_sign_proove_update(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *message, size_t m_t8, uint8_t *out);
-cy_error_t cy_sign_proove_verify(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *message, size_t m_t8, uint8_t *out);
 
-cy_error_t cy_sign_verify_all(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
-cy_error_t cy_sign_verify_init(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
-cy_error_t cy_sign_verify_update(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
-cy_error_t cy_sign_verify_final(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
+/* classical triplet of function int, update, final */
+cy_error_t cy_sign_proove_init(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *nonce,uint8_t *message, size_t m_t8, uint8_t *out);
+cy_error_t cy_sign_proove_update(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, uint8_t *out);
+cy_error_t cy_sign_proove_verify_final(cy_sign_ctx_t *ctx, cy_sk_t *secretkey, uint8_t *message, size_t m_t8, uint8_t *out);
+
+/* a one shot computation of the Signature verification*/
+cy_error_t cy_sign_verify_all(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
+
+
+/* classical triplet of function int, update, final */
+cy_error_t cy_sign_verify_init(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
+cy_error_t cy_sign_verify_update(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
+cy_error_t cy_sign_verify_final(cy_sign_ctx_t *ctx, cy_pk_t *publickey, uint8_t *message, size_t m_t8, boolean_t *flagverif);
 
 cy_error_t cy_sign_uninit(cy_sign_ctx_t *ctx,  uint8_t *message, size_t m_t8);
 

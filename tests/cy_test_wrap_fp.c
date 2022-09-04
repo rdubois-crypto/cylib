@@ -31,8 +31,9 @@
 
 #define _MAX_SIZE_TESTED_FP_T8 48
 
-
-
+/* expected precomputed constant n0 on sec256k1, obtained from sage */
+expected_no_128_256k1[16]={0xbc, 0xb2, 0x23, 0xfe, 0xdc, 0x24, 0xa0, 0x59,
+						   0xd8, 0x38, 0x09, 0x1d, 0xd2, 0x25, 0x35, 0x31};
 
 
 /* size coded on 64 bits lsb*/
@@ -40,31 +41,19 @@
 
 /* test vector from cy_multmontgomery.sage for ?*/
 
-uint8_t mont_aR[] = { 50,  158, 253, 123, 63,  48,  216, 178, 194, 71,  108,
-                      128, 69,  6,   72,  77,  252, 209, 80,  67,  106, 12,
-                      191, 135, 26,  215, 161, 199, 142, 42,  195, 69 };
-uint8_t mont_bR[] = { 73,  229, 65,  191, 148, 133, 121, 235, 78,  146, 235,
-                      245, 232, 240, 248, 15,  24,  76,  109, 176, 77,  248,
-                      103, 0,   19,  221, 232, 109, 23,  205, 242, 150 };
-uint8_t mont_expected[] = { 243, 209, 236, 247, 222, 138, 146, 149,
-                            110, 224, 82,  66,  185, 230, 52,  45,
-                            138, 75,  232, 241, 150, 92,  54,  147,
-                            104, 110, 11,  160, 103, 145, 24,  77 };
-
 uint8_t mod_a[] = { 172, 55,  63,  63,  189, 248, 237, 255, 103, 8,  115, 206, 227, 149, 169, 53,
 			        50,  158, 253, 123, 63, 48,  216, 178, 194, 71,  108, 127, 152, 207, 6, 125,
 					50,  158, 253, 123, 63, 48,  216, 178, 194, 71,  108, 127, 152, 207, 6, 125
 };
+
+/*0xfcd150436a0cbf871ad7a1c7c0c9c1816ff63c0eebb26eb7b79b5dd46cf9eddd*/
+/* expected montgomery 128 bits representant:0xfcd150436a0cbf871ad7a1c7c0c9c1816ff63c0eebb26eb7b79b5dd46cf9eddd*/
 
 uint8_t mod_b[] = { 193, 85,  77, 181, 65,  190, 220, 240, 100, 143, 53,
                     144, 77,  82, 124, 182, 73,  229, 65,  191, 148, 133,
                     121, 235, 78, 146, 235, 245, 39,  155, 167, 120,
 					50,  158, 253, 123, 63, 48,  216, 178, 194, 71,  108, 127, 152, 207, 6, 125};
 
-uint8_t mod_expected[] = { 57,  165, 57,  230, 138, 185, 240, 26,
-                           38,  190, 226, 197, 137, 238, 151, 189,
-                           243, 209, 236, 247, 222, 138, 146, 149,
-                           110, 224, 82,  66,  128, 64,  249, 107 };
 
 
 /* test reciprocity of import and export*/
@@ -109,18 +98,46 @@ int test_InversionFermatLoop(cy_fp_ctx_t *ctx)
 static cy_error_t test_fp_montgomery(cy_fp_ctx_t *ctx)
 {
 	cy_error_t error = CY_OK;
-
-	printf("\n Montgomery on 256k1:");
 	cy_fp_t fp_a, fp_b, fp_aR, fp_bR;
-	uint8_t res[32];
+	uint8_t res[SEC256K1_SIZE_u8];
 	size_t parameters_t8= ctx->t8_modular;
+
+	cy_fp_t fp_temp;
+	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_b));
+
+	cy_bn_t* p_mont_h=cy_get_fp_montgomery_constant1(ctx);
+	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_temp));
+
+
+	if((p_mont_h)==NULL)
+	{
+		printf("\n No Montgomery rep with this lib");
+		return CY_OK;
+	}
+
+	printf("\n Test Montgomery on 256k1:");
+
+	CY_CHECK(cy_fp_from_bn( p_mont_h, &fp_temp ));
+	CY_CHECK(cy_io_fp_printMSB(&fp_temp, "\n R2="));
+
+	p_mont_h=cy_get_fp_montgomery_constant2(ctx);
+	CY_CHECK(cy_fp_from_bn( p_mont_h, &fp_temp ));
+	CY_CHECK(cy_io_fp_printMSB(&fp_temp, "\n n0="));
+
+	p_mont_h=cy_get_fp_montgomery_one(ctx);
+	CY_CHECK(cy_fp_from_bn( p_mont_h, &fp_temp ));
+	CY_CHECK(cy_io_fp_printMSB(&fp_temp, "\n R="));
+
+
+	CY_CHECK(cy_fp_free(&fp_temp));
+	CY_CHECK(cy_fp_free(&fp_b));
+
 
 	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_a));
 
 
 	CY_CHECK(cy_fp_import(mod_a, parameters_t8, &fp_a));
 	CY_CHECK(cy_fp_export( (&fp_a), res, parameters_t8 ));
-	size_t i;
 
 
 	//CY_CHECK(cy_io_fp_printMSB(&fp_a, "\n import/export of fp_a:"));
@@ -129,18 +146,30 @@ static cy_error_t test_fp_montgomery(cy_fp_ctx_t *ctx)
 
 
 	CY_CHECK(cy_fp_alloc(ctx, parameters_t8, &fp_aR));
+	CY_CHECK(cy_fp_mul(&fp_b, &fp_a, &fp_aR));
 
-	//CY_CHECK(cy_fp_mont_import(mod_a, parameters_t8, &fp_aR));
+	CY_CHECK(cy_io_fp_printMSB(&fp_aR, "\n ---a*b= "));
+
+
+
+	CY_CHECK(cy_fp_mont_import(mod_a, parameters_t8, &fp_aR));
+
+	CY_CHECK(cy_io_fp_printMSB(&fp_a, "\n ---a= "));
+	CY_CHECK(cy_io_fp_printMSB(&fp_aR, "\n ---aR= "));
+
+	CY_CHECK(cy_fp_mult_mont(&fp_b, &fp_aR, &fp_aR));
+	CY_CHECK(cy_io_fp_printMSB(&fp_aR, "\n ---Mulmont(aR*b)= "));
 
 	//printf("n aR=%x", (unsigned int )*fp_aR.bn);
 
-	//CY_CHECK(cy_fp_export( (ctx->montgomery_ctx), res, parameters_t8 ));
-
+	//CY_CHECK(cy_bn_export( p_mont_h, res, parameters_t8 ));
 
 
 	CY_CHECK(cy_fp_free(&fp_a));
 	CY_CHECK(cy_fp_free(&fp_aR));
 	CY_CHECK(cy_fp_free(&fp_b));
+
+
 
 
 	end:

@@ -74,8 +74,24 @@ cy_error_t cy_fp2_import(uint8_t *in, size_t fp2_t8, cy_fp2_t *out)
 	  goto end;
   }
 
-  CY_CHECK(cy_fp_import(in, ctx_fp->t8_modular, out->x));
-  CY_CHECK(cy_fp_import(in+ctx_fp->t8_modular, ctx_fp->t8_modular, out->y));
+  CY_CHECK(cy_fp_mont_import(in, ctx_fp->t8_modular, out->x));
+  CY_CHECK(cy_fp_mont_import(in+ctx_fp->t8_modular, ctx_fp->t8_modular, out->y));
+
+  end:
+    return error;
+}
+
+cy_error_t cy_fp2_export(const cy_fp2_t *in,   uint8_t *out, size_t fp2_t8)
+{
+  cy_fp_ctx_t *ctx_fp=(in->ctx_fp);
+  cy_error_t error = CY_KO;
+
+  if(fp2_t8!=ctx_fp->t8_modular){
+	  goto end;
+  }
+
+  CY_CHECK(cy_fp_mont_export(in->x,  out, ctx_fp->t8_modular));
+  CY_CHECK(cy_fp_mont_export(in->y,  out+ctx_fp->t8_modular, ctx_fp->t8_modular));
 
   end:
     return error;

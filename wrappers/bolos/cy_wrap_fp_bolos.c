@@ -108,7 +108,8 @@ end:
   return error;
 }
 
-/* an emulation of cx_mont_mul, not present in speculos, compute a*b*R mod p*/
+/* an horrible emulation of cx_mont_mul, not present in speculos, compute aR*bR=abR mod p*/
+/* todo: integrate some decent Montgomery implementation */
 cy_error_t cy_mont_mul(cx_bn_t r, const cx_bn_t a, const cx_bn_t b,
                        const cy_bn_mont_ctx_t *ctx)
 {
@@ -117,13 +118,16 @@ cy_error_t cy_mont_mul(cx_bn_t r, const cx_bn_t a, const cx_bn_t b,
 
   cx_bn_t temp;
 
-  CY_CHECK(sys_cx_bn_nbytes(ctx->h, &field_t8));
+
+  CY_CHECK(sys_cx_bn_nbytes(ctx->n, &field_t8));
 
   CY_CHECK(sys_cx_bn_alloc(&temp, field_t8));
 
-  cx_bn_t *p = (cx_bn_t *)ctx->n;
-  CY_CHECK(sys_cx_bn_mod_mul(temp, a, b, *p));
-  CY_CHECK(sys_cx_bn_mod_mul(r, temp, ctx->h, *p));
+
+  CY_CHECK(sys_cx_bn_mod_invert_nprime( temp, ctx->h, ctx->n));/* R^-1 (yes an inversion to emulate a mul, god forgive me)*/
+
+  CY_CHECK(sys_cx_bn_mod_mul(temp, a, temp, ctx->n));
+  CY_CHECK(sys_cx_bn_mod_mul(r, b, temp, ctx->n));
 
   /* destroy*/
   sys_cx_bn_destroy(&temp);
@@ -162,6 +166,8 @@ cy_error_t cy_mont_alloc(cx_bn_mont_ctx_t *ctx, size_t t8_length)
 
   CY_CHECK(sys_cx_bn_alloc(&ctx->n, t8_length));
   CY_CHECK(sys_cx_bn_alloc(&ctx->h, t8_length));
+  CY_CHECK(sys_cx_bn_alloc(&ctx->h2, t8_length));
+
   CY_CHECK(sys_cx_bn_alloc(&ctx->mpinv, t8_length));
 
   /*printf("\n mont alloc:%x %x %x with size %d", ctx->n, ctx->h, ctx->mpinv,
@@ -181,6 +187,7 @@ cy_error_t cy_mont_destroy(cy_bn_mont_ctx_t *ctx)
   CY_CHECK(sys_cx_bn_destroy(&ctx->n));
   CY_CHECK(sys_cx_bn_destroy(&ctx->h));
   CY_CHECK(sys_cx_bn_destroy(&ctx->mpinv));
+  CY_CHECK(sys_cx_bn_destroy(&ctx->h2));
 
   /*printf("\n mont alloc:%x %x %x with size %d", ctx->n, ctx->h, ctx->mpinv,
          (int)t8_length);*/
@@ -229,7 +236,7 @@ cy_error_t cy_mont_init(cy_bn_mont_ctx_t *ctx, const cy_bn_t n)
       basis,
       (sizen << 3) - 1)); /*2^(sizeofp)-1 to fit in memory before reduction*/
   CX_CHECK(sys_cx_bn_mod_add(ctx->h, basis, basis, n)); /* 2^(bitsize(p))*/
-  CX_CHECK(sys_cx_bn_mod_mul(ctx->h, ctx->h, ctx->h, n)); /* 2^(bitsize(p))^2*/
+  CX_CHECK(sys_cx_bn_mod_mul(ctx->h2, ctx->h, ctx->h, n)); /* 2^(bitsize(p))^2*/
 
 
   /* IV. Free*/
@@ -249,8 +256,10 @@ cy_error_t cy_mont_init2(cy_bn_mont_ctx_t *ctx, const cx_bn_t n,
   /* III. Computations*/
   CY_CHECK(sys_cx_bn_copy((ctx->n), n));
   CY_CHECK(sys_cx_bn_copy((ctx->h), h));
-  //   CY_CHECK(cy_mod_neg(ctx->mpinv, ctx->h, basis)); /*-1/P*/
+  CY_CHECK(sys_cx_bn_copy((ctx->h2), h));
 
+  //   CY_CHECK(cy_mod_neg(ctx->mpinv, ctx->h, basis)); /*-1/P*/
+  error=CY_KO;
 /* V. Return*/
 end:
   return error;
@@ -326,7 +335,7 @@ cy_error_t wrap_bolos_fp_init(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
                          ps_ctx->t8_modular));
 
   CY_CHECK(cy_mont_init((cy_bn_mont_ctx_t *)ps_ctx->montgomery_ctx, bn_p));
-  ps_ctx->offset = 3 * sizeof(bn_p);
+  ps_ctx->offset = 4 * sizeof(bn_p);
 
   /* IV. Free*/
   sys_cx_bn_destroy(&bn_p);
@@ -557,9 +566,10 @@ cy_error_t wrap_bolos_fp_mult_mont(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 
 
 	  CY_IS_INIT(ctx);
-	  CX_CHECK(cy_mont_mul(*(out->bn), *(a->bn), *(b->bn),
-	                             ((cy_bn_mont_ctx_t *)ctx->montgomery_ctx)));
+	  CX_CHECK(cy_mont_mul(*(out->bn), *(a->bn), *(b->bn), ((cy_bn_mont_ctx_t *)ctx->montgomery_ctx)));
 
+	  UNUSED(b);
+	  UNUSED(out);
 	end:
 	  return error;
 
@@ -613,6 +623,26 @@ cy_error_t wrap_bolos_mont_import(const uint8_t *in, const size_t t8_in, cy_fp_t
 	  return error;
 }
 
+
+
+cy_error_t wrap_bolos_mont_export(const cy_fp_t *in, uint8_t *out , size_t t8_out)
+{
+	cy_error_t error = CY_KO;
+	cy_fp_ctx_t *ctx = in->ctx;
+	cy_fp_t temp;
+	cy_fp_alloc(ctx, t8_out, &temp);
+
+    CY_IS_INIT(ctx);
+
+    CY_CHECK(	      cx_mont_from_montgomery(*(in->bn), *(in->bn), ctx->montgomery_ctx));
+	CY_CHECK( wrap_bolos_fp_export(in,  out, t8_out));
+
+	cy_fp_free(&temp);
+
+	end:
+		  return error;
+}
+
 cy_error_t wrap_bolos_fp_uninit(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
                                 const size_t t8_Memory)
 {
@@ -625,7 +655,7 @@ cy_error_t wrap_bolos_fp_uninit(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
   /* from here, if correctly used, the only element remaining are the montgomery context*/
   cy_mont_destroy(ctx);
 
-  for(i=0;i<3*sizeof(cx_bn_t *);i++)
+  for(i=0;i<4*sizeof(cx_bn_t *);i++)
     {
  	  pu8_Mem[i]=_MEM_FP_RESERVED;
     }
@@ -651,20 +681,52 @@ end:
 /*	III. Access to private fields methods
  */
 /*****************************************************************************/
+cy_error_t wrap_cy_fp_from_bn( const cy_bn_t *in, cy_fp_t *out ){
+	cy_error_t error = CY_KO;
 
-cy_bn_t* wrap_bolos_get_fp_montgomery_constant1(cy_fp_t *in)
-{
-	cy_bn_t *res=NULL;
-	cy_fp_ctx_t *ctx = in->ctx;
+	  cy_fp_ctx_t *ctx = out->ctx;
+	  CY_IS_INIT(ctx);
 
-	if (ctx->is_initialized != CY_LIB_INITIALIZED) {
-	    goto end;
-	 }
-
-	cy_bn_mont_ctx_t *mont_ctx= (cy_bn_mont_ctx_t *) ctx->montgomery_ctx;
-	res=&mont_ctx->h;
+	  CX_CHECK(sys_cx_bn_copy(*(out->bn), *in));
 
 	end:
+	  return error;
+}
+
+cy_bn_t* wrap_bolos_get_fp_montgomery_constant1(const cy_fp_ctx_t *in)
+{
+	cy_bn_t *res=NULL;
+
+	cy_bn_mont_ctx_t *mont_ctx= (cy_bn_mont_ctx_t *) in->montgomery_ctx;
+	res=&mont_ctx->h2;
+
+
 	  return res;
 }
+
+cy_bn_t* wrap_bolos_get_fp_montgomery_constant2(const cy_fp_ctx_t *in)
+{
+	cy_bn_t *res=NULL;
+
+	cy_bn_mont_ctx_t *mont_ctx= (cy_bn_mont_ctx_t *) in->montgomery_ctx;
+	res=&mont_ctx->mpinv;
+
+
+	  return res;
+}
+
+cy_bn_t* wrap_bolos_get_fp_montgomery_one(const cy_fp_ctx_t *in)
+{
+
+	cy_bn_t *res=NULL;
+
+	cy_bn_mont_ctx_t *mont_ctx= (cy_bn_mont_ctx_t *) in->montgomery_ctx;
+	res=&mont_ctx->h;
+
+  return res;
+
+}
+
+
+
 
