@@ -210,8 +210,7 @@ static cy_error_t test_fp_add(cy_fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 
 	  CY_CHECK(cy_fp_export(&fp_r, exported, parameters_t8));
 
-	  debut_print_MsbString(exported, parameters_t8, "\n Add result:\n");
-
+	  _debug(print_MsbString(exported, parameters_t8, "\n Add result:\n"));
 
 
 	  CY_CHECK(cy_fp_free(&fp_a));
@@ -230,15 +229,15 @@ static cy_error_t test_fp_add(cy_fp_ctx_t *ctx, uint8_t *Ramp, size_t sizeRam)
 }
 
 
-static int test_crypto_parameters( char *name, uint8_t *Ramp, size_t sizeRam, cx_testvec_weierstrass_t const *C_cx_allCurves)
+static int test_crypto_parameters( char *name, uint8_t *Ramp, size_t sizeRam, cx_testvec_weierstrass_t const *C_cy_allCurves)
 {
   cy_fp_ctx_t ctx;
 
   cy_error_t error = CY_OK;
 
   const uint8_t *argv_gen[]={NULL, NULL};
-  argv_gen[0]=C_cx_allCurves->t8_size;
-  argv_gen[1]=C_cx_allCurves->p;
+  argv_gen[0]=C_cy_allCurves->t8_size;
+  argv_gen[1]=C_cy_allCurves->p;
 
   size_t parameters_t8=(size_t) (argv_gen[0][0]);
 
@@ -272,7 +271,7 @@ static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
 {
 	cy_error_t error = CY_OK;
 	size_t i;
-	size_t nb_supported=sizeof(C_cx_allCurves)/sizeof(cx_testvec_weierstrass_t *);
+	size_t nb_supported=sizeof(C_cy_allCurves)/sizeof(cx_testvec_weierstrass_t *);
 
 	printf("\n/************************ Test Fp Unit:");
 
@@ -284,10 +283,10 @@ static cy_error_t test_fp_unit(uint8_t *Ramp, size_t Ramp_t8)
 
 	for(i=0;i<nb_supported;i++){
 
-	    argv_gen[0]=C_cx_allCurves[i]->t8_size;
-	    argv_gen[1]=C_cx_allCurves[i]->p;
+	    argv_gen[0]=C_cy_allCurves[i]->t8_size;
+	    argv_gen[1]=C_cy_allCurves[i]->p;
 
-	 CY_CHECK(test_crypto_parameters(C_cx_allCurves[i]->curve_name, Ramp, Ramp_t8, C_cx_allCurves[i]));
+	 CY_CHECK(test_crypto_parameters(C_cy_allCurves[i]->curve_name, Ramp, Ramp_t8, C_cy_allCurves[i]));
 	}
 
 	end:

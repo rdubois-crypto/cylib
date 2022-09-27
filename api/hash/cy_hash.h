@@ -6,8 +6,7 @@
 /* License: This software is licensed under a dual BSD and GPL v2 license.
  */
 /* See LICENSE file at the root folder of the project.*/
-/* FILE: cy_errors.h
- */
+/* FILE: cy_hash.h*/
 /* 																			      */
 /* 																			      */
 /* DESCRIPTION: hash functions  API */
@@ -21,9 +20,9 @@ typedef cy_error_t (*Fct_Hash_Configure_t)(void *io_ps_ctx, uint8_t *initializer
                                      size_t initializer_t8);
 
 typedef cy_error_t (*Fct_Hash_Init_t)(void *io_ps_ctx, uint8_t *in,
-                                     size_t in);
+                                     size_t t8_in);
 typedef cy_error_t (*Fct_Hash_Update_t)(void *io_ps_ctx, uint8_t *in,
-                                    size_t in_t8);
+                                    size_t t8_in);
 typedef cy_error_t (*Fct_Hash_Final_t)(void *io_ps_ctx, uint8_t *out);
 
 typedef cy_error_t (*Fct_Hash_All_t)(uint8_t *in, size_t in_t8, uint8_t *out);
@@ -52,6 +51,7 @@ struct hash_ctx_s {
 /* todo: provide ready to use structures */
 #define _SHA512_ID 1
 #define _KECCAK256_ID 2
+#define _PEDDERSEN_ID 3
 
 #define MAX_HASH_T8 64
 typedef struct hash_ctx_s cy_hash_ctx_t;

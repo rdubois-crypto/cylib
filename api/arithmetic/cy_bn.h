@@ -16,7 +16,6 @@
 #include "cy_errors.h"
 #include "cy_memory_unit.h"
 
-_CY_API extern cy_error_t cy_bn_export( const cy_bn_t *in,    size_t bn_t8, uint8_t *out );
 
 /* IO handling */
 _CY_API extern cy_error_t cy_bn_import( const uint8_t *in, size_t bn_t8, cy_bn_t *out );
@@ -32,6 +31,8 @@ _CY_API extern cy_error_t cy_bn_copy(const cy_bn_t *in, cy_bn_t *out);
 _CY_API extern cy_error_t cy_bn_add(  cy_bn_t *a, cy_bn_t *b, cy_bn_t *r);
 _CY_API extern cy_error_t cy_bn_sub( cy_bn_t *a, cy_bn_t *b, cy_bn_t *r);
 _CY_API extern cy_error_t cy_bn_neg( cy_bn_t *a,  cy_bn_t *out);
+_CY_API extern cy_error_t cy_bn_shift_r(const size_t t1_shift, cy_bn_t *out);
+_CY_API extern cy_error_t cy_bn_or( const cx_bn_t *a, const cx_bn_t *b, cx_bn_t *r);
 
 _CY_API extern cy_error_t cy_bn_inc(cy_bn_t *in, cy_bn_t *out);
 _CY_API extern cy_error_t cy_bn_dec(cy_bn_t *in, cy_bn_t *out);

@@ -46,5 +46,12 @@ typedef  enum {
 
 #define word32_from_be(a) (a[0] + (a[1] << 8) + (a[2] << 16) + (a[3] << 24))
 
+#define be_from_word32(b,a) do{\
+	a[0]=(unsigned char ) (b&0xff);\
+	a[1]=(unsigned char ) (b>>8)&0xff;\
+	a[2]=(unsigned char ) (b>>16)&0xff;\
+	a[3]=(unsigned char ) (b>>24)&0xff;\
+	}\
+	while(0)
 
 #endif /* SRC_INNOVATION_CY_DEF_H_ */

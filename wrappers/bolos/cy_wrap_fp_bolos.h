@@ -55,7 +55,7 @@ typedef struct cy_bn_mont_ctx_s cy_bn_mont_ctx_t;
 #define cy_fp_sub(a, b, r) (wrap_bolos_fp_sub(a, b, r))
 #define  cy_fp_neg( in, out) (wrap_bolos_fp_neg(in, out))
 #define  cy_fp_cmp( in1, in2, out) (in1, in2, out))
-
+#define cy_fp_set_zero(out) wrap_bolos_fp_set_zero(out)
 
 #define cy_fp_mul(a, b, r) (wrap_bolos_fp_mul(a, b, r))
 #define cy_fp_sqr(in, out) (wrap_bolos_fp_sqr(in,  out))
@@ -63,6 +63,8 @@ typedef struct cy_bn_mont_ctx_s cy_bn_mont_ctx_t;
 #define cy_fp_mult_mont(a, b, r) (wrap_bolos_fp_mult_mont(a,b,r))
 #define cy_fp_inv(a, r) (wrap_bolos_fp_inv(a, r))
 #define cy_fp_copy(in, out) (wrap_bolos_fp_copy(in, out))
+
+#define cy_fp_get_random(gda,out) wrap_bolos_fp_get_random(gda,out)
 
 //#define cy_fp_inv(a, r) CY_UNIMPLEMENTED_F(cy_fp_inv, a,r)
 /* montgomery */

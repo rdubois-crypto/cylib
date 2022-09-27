@@ -25,6 +25,9 @@ extern  void print_MsbString(uint8_t *String, size_t String_t8, char *prefix);
 #if (defined(_DEBUG_BURRITOS)) || (!defined(_TEST_ALL))
 
 #define _debug(cmd) cmd
+/* variadic  ISO/IEC 9899:1999*/
+#define debug_printf(...) printf ( __VA_ARGS__)
+
 
 extern  void debug_Print_RAMp(uint8_t *Ramp, size_t RAM_t8);
 

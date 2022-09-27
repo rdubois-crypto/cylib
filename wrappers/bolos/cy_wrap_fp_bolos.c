@@ -297,11 +297,15 @@ cy_error_t wrap_bolos_fp_init(cy_fp_ctx_t *ps_ctx, uint8_t *pu8_Mem,
   if (argc != 2) {
     return CY_KO;
   }
+
+ // printf("\n required mem fp init:%d", (int) t8_Memory);
+
   /*control memory limit*/
   if (t8_Memory > _MAX_MEMORY) {
     error = CY_KO;
     goto end;
   }
+
   for(i=0;i<t8_Memory;i++) pu8_Mem[i]=_MEM_FP_RESERVED;
 
   ps_ctx->Shared_Memory = pu8_Mem ; /*set Memory*/
@@ -474,6 +478,7 @@ cy_error_t wrap_bolos_fp_neg( cy_fp_t *a,  cy_fp_t *out)
 	  end:
 	    return error;
 }
+
 
 cy_error_t wrap_bolos_fp_sub(cy_fp_t *a, cy_fp_t *b, cy_fp_t *out)
 {
@@ -676,7 +681,18 @@ end:
   return error;
 }
 
+cy_error_t wrap_bolos_fp_get_random(cy_gda_ctx_t *gda, cy_fp_t *out)
+{
+	cy_error_t error = CY_KO;
+	 cy_fp_ctx_t *ctx = out->ctx;
+	 CY_IS_INIT(ctx);
+	 UNUSED(gda);
 
+	 CX_CHECK(sys_cx_bn_rand(*(out->bn)));
+
+	 end:
+	 	  return error;
+}
 /*****************************************************************************/
 /*	III. Access to private fields methods
  */

@@ -7,6 +7,9 @@
 #/* 																			   */
 #/* DESCRIPTION: computation of Montgomery constants							   */
 #/**********************************************************************************/
+
+load('../common/io_conversions.sage');
+
 ####################################		
 def precompute_montgomery_constants(name, n, sizeword, sizecurve):
 	print("Montgomery constants for",name)
@@ -41,34 +44,6 @@ def Conv_word(A, size_word):
 	print("};");
 	return M;	
 	
-#/*********** Simulating machine words ************/ 
-def Conv_word_LSB(A, size_word):
-	sizeA=ceil(log(A)/log(2))  
-	print("sizeA=",sizeA)
-	sizeM=ceil(sizeA/size_word)
-	print("sizeM=",sizeM)
-	M=copy(matrix(1, sizeM)[0])
-	
-	mask = 2^size_word-1
-	for i in [0..sizeM-1]:
-		M[i]= A 	& mask;
-		print("i=",hex(M[i]));
-		A = A >> size_word
-	return M;	
-	
-def Conv_word_MSB(A, size_word):
-	sizeA=ceil(log(A)/log(2))  
-	print("sizeA=",sizeA)
-	sizeM=ceil(sizeA/size_word)
-	print("sizeM=",sizeM)
-	M=copy(matrix(1, sizeM)[0])
-	
-	mask = 2^size_word-1
-	for i in [0..sizeM-1]:
-		M[sizeM-1-i]= A 	& mask;
-		print("i=",hex(M[sizeM-1-i]));
-		A = A >> size_word
-	return M;	
 	
 #sec256k1 modulus
 n=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F

@@ -24,8 +24,20 @@
 #include "cy_memory_unit.h"
 #include "cy_gda_component.h"
 
+/************** CONFIGURATION OF THE LIBRARY ****/
+/* The following compilation options enable the selection of which
+ * library/cryptographic component is used for each service. Those services contains:
+ * - gda/trng (physical true random number generator)
+ * - fp : modular integers
+ * - fp2: quadratic extensions
+ * - fp12: dodecaic extensions
+ * - ec: elliptic curves computations
+ */
 
-//#ifndef _FP_UNIT_SELECTED
+
+/************** CHOOSE YOUR GDA (TRNG) UNIT ****/
+#define _GDA_BOLOS_BURRITOS
+
 /************** CHOOSE YOUR FP UNIT ****/
 /*Pick a burritos ingredient to be used for prime fields */
 #define _FP_BOLOS_BURRITOS /* bolos*/
@@ -33,11 +45,15 @@
 //#define _FP_LIBECC_BURRITOS /* libecc*/
 //#define _FP_CY_BURRITOS /* bolos*/
 //#define _FP_ENCLAVE_BURRITOS /* bolos-enclave*/
+
 /************** CHOOSE YOUR FP2 UNIT ****/
 #define _FP2_CY_BURRITOS
+
 /************** CHOOSE YOUR FP12 UNIT ****/
 #define _FP12_CY_BURRITOS
 
+/************** CHOOSE YOUR EC UNIT ****/
+#define _EC_BOLOS_BURRITOS
 
 
 #ifdef _FP_BOLOS_BURRITOS
@@ -46,6 +62,7 @@
 #include "bolos/cx_ec.h"
 #include "bolos/cxlib.h"
 #include "../wrappers/bolos/cy_wrap_fp_bolos.h"
+#include "../wrappers/bolos/cy_wrap_bolos_bn.h"
 
 #define _FP_UNIT_SELECTED
 #endif
@@ -93,5 +110,21 @@
 
 #include "../wrappers/bolos/cy_wrap_bolos_cryptolib.h"
 
+
+/************** CHOOSE YOUR EC UNIT ****/
+#ifdef _EC_BOLOS_BURRITOS
+#include "../wrappers/bolos/cy_wrap_bolos_ec.h"
 #endif
+
+#endif
+
+
+/************** CHOOSE YOUR GDA UNIT ****/
+
+
+#ifdef _GDA_BOLOS_BURRITOS
+ #include "../wrappers/bolos/cy_wrap_bolos_gda.h"
+#endif
+
+
 

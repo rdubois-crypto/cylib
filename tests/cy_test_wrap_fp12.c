@@ -166,19 +166,19 @@ static cy_error_t test_fp12_unit(uint8_t *Ramp, size_t Ramp_t8)
 
 	printf("\n nb supported modules=%d", _QUADRATIC_FRIENDLY_END);
 
-	// const uint8_t *argv_bls381[] = { secp384r1_t8, C_cx_BLS12_381_G1_p };
-	 //const uint8_t *argv_sec384[] = { secp384r1_t8, C_cx_secp384r1_p };
-	 //C_cx_secp384r1->argv,
+	// const uint8_t *argv_bls381[] = { secp384r1_t8, C_cy_BLS12_381_G1_p };
+	 //const uint8_t *argv_sec384[] = { secp384r1_t8, C_cy_secp384r1_p };
+	 //C_cy_secp384r1->argv,
     const uint8_t *argv_gen[]={NULL, NULL};
 
 
 
 	for(i=0;i<_QUADRATIC_FRIENDLY_END;i++){
 
-	    argv_gen[0]=C_cx_allCurves[i]->t8_size;
-	    argv_gen[1]=C_cx_allCurves[i]->p;
+	    argv_gen[0]=C_cy_allCurves[i]->t8_size;
+	    argv_gen[1]=C_cy_allCurves[i]->p;
 
-	 CY_CHECK(test_fp12_crypto_parameters(argv_gen, 2, C_cx_allCurves[i]->curve_name, Ramp, Ramp_t8));
+	 CY_CHECK(test_fp12_crypto_parameters(argv_gen, 2, C_cy_allCurves[i]->curve_name, Ramp, Ramp_t8));
 	}
 
 

@@ -70,12 +70,15 @@ _CY_API extern cy_error_t cy_fp_free(cy_fp_t *fp);
 /* IO handling */
 _CY_API extern cy_error_t cy_fp_import( const uint8_t *in, size_t fp_t8, cy_fp_t *out );
 _CY_API extern cy_error_t cy_fp_from_bn( const cy_bn_t *in, cy_fp_t *out );
+_CY_API extern cy_error_t cy_fp_from_u32( const uint32_t in, cy_fp_t *out );
 
 _CY_API extern cy_error_t cy_fp_export(const cy_fp_t *in, uint8_t *out , size_t t8_out);
 _CY_API extern cy_error_t cy_to_fp( uint8_t *in, size_t fp_t8,  DATA_FORMAT how, cy_fp_t *out );
 _CY_API extern cy_error_t cy_from_fp( uint8_t *in, size_t fp_t8,  DATA_FORMAT how, cy_fp_t *out );
 _CY_API extern cy_error_t cy_fp_set_zero(cy_fp_t *out);
 _CY_API  extern cy_error_t cy_fp_set_one(cy_fp_t *out);
+
+_CY_API  extern cy_error_t cy_fp_set_zero(cy_fp_t *out);
 _CY_API extern cy_error_t cy_fp_copy(const cy_fp_t *in, cy_fp_t *out);
 
 

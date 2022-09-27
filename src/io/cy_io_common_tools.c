@@ -25,8 +25,6 @@
 #if (defined(_DEBUG_BURRITOS)) || (!defined(_TEST_ALL))
 #include <stdio.h>
 
-/* variadic  ISO/IEC 9899:1999*/
-#define debug_printf(...) printf ( __VA_ARGS__)
 //#define debug_printf(...) UNUSED(0)
 
  void debug_Print_RAMp(uint8_t *Ramp, size_t RAM_t8)

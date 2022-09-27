@@ -9,12 +9,16 @@
 /* https://eprint.iacr.org/2020/1261.pdf             */
 /* note that some constant aggregating values could be precomputed	*/
 /**********************************************************************************/
+#include <stdint.h>
+#include <stddef.h>
+
+#include "cy_configuration.h"
 #include "cy_fp.h"
 #include "cy_ec.h"
 #include "cy_hash.h"
 #include "cy_musig2.h"
 
-
+#ifdef _TESTED
 /* Initialize Musig with Signatures functions, number of users, hash functions */
 cy_error_t cy_musig_SetUp(cy_musig2_ctx_t *ctx,  uint8_t *Ramp, size_t sizeRamp,
 		  uint8_t *initializer, size_t init_t,
@@ -284,7 +288,7 @@ cy_error_t cy_musig_SigAgg_Round2(const size_t n_users, const cy_fp_t **vec_sig2
 /* R and c being computable from aggregation of Rijs_Round1, S being output of Round2 sign'*/
 
 cy_error_t cy_musig_Verification_All(cy_musig2_ctx_t *ctx, cy_ecpoint_t *Key_agg,
-		cy_ecpoint_t *R, cy_fp_t *s, cy_fp_t *c,
+		cy_ecpoint_t *R, cy_fp_t *s,
 		const uint8_t *message, const size_t message_t8,
 		boolean_t *flag_verif){
 
@@ -292,21 +296,24 @@ cy_error_t cy_musig_Verification_All(cy_musig2_ctx_t *ctx, cy_ecpoint_t *Key_agg
 	cy_error_t error=CY_KO;
 	*flag_verif=CY_FALSE;
 	cy_ecpoint_t ec_temp1, ec_temp2;
+
 	CY_CHECK(cy_ec_alloc(ctx->ctx_ec, &ec_temp1));
 	CY_CHECK(cy_ec_alloc(ctx->ctx_ec, &ec_temp2));
 
 	/* Accept iff g^s = R.X^c, beware of multiplicative notations*/
 	cy_ecpoint_t *G=cy_ec_get_generator(ctx->ctx_ec); /* get generating point of the curve , todo ec: coder un get_generator */
 	CY_CHECK(cy_ec_scalarmult_fp(ctx->ctx_ec, G, s, &ec_temp1)); 	/*g^s*/
-	CY_CHECK(cy_ec_scalarmult_fp(ctx->ctx_ec, Key_agg, c, &ec_temp2)); 	/*X^c*/
-	CY_CHECK(cy_ec_add(ctx->ctx_ec, ec_temp2, R, &ec_temp2)); 	/*R.X^c*/
+	/* todo: c should be recomputed here internally */
+	/* append R in Hashin*/
+
+	//CY_CHECK(cy_ec_export(&ctx->ctx_ec->ctx_fp_q, R,ctx->ctx_ec->t8_modular_p,buffer));
+	//ctx->H->Hash_Update((void *)ctx->H, buffer, ctx->ctx_ec->t8_modular_p);
+	/* append message in Hashin*/
+	//ctx->H->Hash_Update((void *)ctx->H, message, message_t8);
+	//ctx->H->Hash_Final((void *)ctx->H, c); /* final c value */
 
 
-	/* final verification */
-	CY_CHECK(cy_ec_iseq(ctx->ctx_ec, ec_temp1, ec_temp2, flag_verif));
-
-	CY_CHECK(cy_ec_free( &ec_temp1));
-	CY_CHECK(cy_ec_free( &ec_temp2));
+	CY_CHECK(cy_musig_Verification_Core(ctx, Key_agg, R, fp_s, fp_c, flag_verif));
 
 	end:
 		return error;
@@ -316,3 +323,50 @@ cy_error_t cy_musig_Verification_All(cy_musig2_ctx_t *ctx, cy_ecpoint_t *Key_agg
 
 
 
+
+#endif
+/*************************************************************/
+/* Verification function									 */
+/*************************************************************/
+/* the two part of signatures (R,S) received from previous round, */
+/* R and c being computable from aggregation of Rijs_Round1, S being output of Round2 sign'*/
+
+cy_error_t cy_musig_Verification_Core(cy_musig2_ctx_t *ctx, cy_ecpoint_t *Key_agg,
+		cy_ecpoint_t *R, cy_fp_t *fp_s, cy_fp_t *fp_c,
+		boolean_t *flag_verif){
+
+	cy_error_t error=CY_KO;
+	*flag_verif=CY_FALSE;
+	cy_ecpoint_t ec_temp1, ec_temp2, G;
+
+	CY_CHECK(cy_ec_alloc(ctx->ctx_ec, &ec_temp1));
+	CY_CHECK(cy_ec_alloc(ctx->ctx_ec, &ec_temp2));
+
+	/* Accept iff g^s = R.X^c, beware of multiplicative notations*/
+	CY_CHECK(cy_ec_alloc(ctx->ctx_ec, &G));
+	CY_CHECK(cy_ec_get_generator(ctx->ctx_ec, &G));
+
+	CY_CHECK(cy_ec_scalarmult_fp(fp_s, &G, &ec_temp1)); 	/*g^s*/
+	/* todo: c should be recomputed here internally */
+	/* append R in Hashin*/
+
+	//CY_CHECK(cy_ec_export(&ctx->ctx_ec->ctx_fp_q, R,ctx->ctx_ec->t8_modular_p,buffer));
+	//ctx->H->Hash_Update((void *)ctx->H, buffer, ctx->ctx_ec->t8_modular_p);
+	/* append message in Hashin*/
+	//ctx->H->Hash_Update((void *)ctx->H, message, message_t8);
+	//ctx->H->Hash_Final((void *)ctx->H, c); /* final c value */
+
+
+	CY_CHECK(cy_ec_scalarmult_fp(fp_c, Key_agg,  &ec_temp2)); 	/*X^c*/
+	CY_CHECK(cy_ec_add( &ec_temp2, R, &ec_temp2)); 	/*R.X^c*/
+
+	/* final verification */
+	CY_CHECK(cy_ec_iseq( &ec_temp1, &ec_temp2, 	flag_verif));
+
+	CY_CHECK(cy_ec_free( &ec_temp1));
+	CY_CHECK(cy_ec_free( &ec_temp2));
+	CY_CHECK(cy_ec_free( &G));
+
+	end:
+		return error;
+}

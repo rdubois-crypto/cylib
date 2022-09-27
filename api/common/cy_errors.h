@@ -59,7 +59,7 @@ typedef int cy_flag_t;
 
 /* Elliptic curve  errors*/
 
-#define CY_UNHANDLED_CURVE 0xffffffffffffff33
+#define CY_UNHANDLED_CURVE 0xfffff33
 
 /* Quadratic extensions  errors*/
 
